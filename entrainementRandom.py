@@ -3,18 +3,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from network import Network
+from network_v2 import Network_2
 
 
 
 
 # Initialisation
-nbUsers = 4
-net = Network(nbUsers=4, learning_rate=0.01)
+nbUsers = 8
+vitesseInit = 0.01
+
 regroupementTauxSucc = []
 meanTauxSucc =[]
 stockageVitesses = []
 qteMAx = 2000
-vitesseInit = 0.01
+net = Network_2(nbUsers=nbUsers, learning_rate=vitesseInit)
 
 
 #Boucle pour tester différentes valeurs de mon LR
@@ -22,13 +24,12 @@ vitesseInit = 0.01
     #net.updateLR(vitesse)
 #vitesse = round(vitesse, 2)
 
-net = Network(nbUsers=4, learning_rate=vitesseInit)
 #stockageVitesses.append(vitesse)
 
 
 tauxSuccesTot = []
 
-for entrainement in range(25000):
+for entrainement in range(2000):
 
     # État initial des quantités (ex: chaque user a entre 0 et 700 unités)
     quantites_reelles = np.random.randint(0, 700, size=nbUsers).astype(float)
@@ -61,7 +62,7 @@ for entrainement in range(25000):
         qtes_norm = quantites_reelles / sommeQte
 
         # 3. Construire le vecteur d'entrée [S1, Q1, S2, Q2...]
-        inputs = np.empty(8)
+        inputs = np.empty(nbUsers*2)
         inputs[0::2] = snrs_norm
         inputs[1::2] = qtes_norm
 
@@ -157,7 +158,7 @@ for i, groupe in enumerate(regroupementTauxSucc):
     p = np.poly1d(z)
     x_smooth = np.linspace(x_groupe[0], x_groupe[-1], 300)
     ax.plot(x_smooth, p(x_smooth), color=couleurs[i % len(couleurs)],
-            linestyle="--", label=f"Tendance groupe {i+1} sigma : {np.nanstd(groupe)}")
+            linestyle="--") #label=f"Tendance groupe {i+1} sigma : {np.nanstd(groupe)}
     
     offset += len(groupe)
 
