@@ -47,7 +47,7 @@ class Network_2:
         self.a1 = reLU(self.z1)
         
         self.z2 = np.dot(self.W2, self.a1) + self.b2
-        self.a2 = softmax(self.z2)
+        self.a2 = reLU(self.z2)
 
         self.z3 = np.dot(self.W3, self.a2) + self.b3
         self.a3 = softmax(self.z3)
@@ -62,10 +62,6 @@ class Network_2:
         m = 1 # On traite un exemple à la fois (Stochastic Gradient Descent)
 
         # 1. Erreur sur la couche de sortie (Delta 2)
-        # Dérivée de la fonction de coût (MSE) : (a2 - y_true)
-        #d_a2 = self.a2 - y_true
-        #delta2 = d_a2 * sigmoid_Prime(self.z2)
-
         delta3 = self.a3 - y_true
 
         # 2. Erreur sur la couche cachée (Delta 1)

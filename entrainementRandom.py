@@ -29,7 +29,7 @@ net = Network_2(nbUsers=nbUsers, learning_rate=vitesseInit)
 
 tauxSuccesTot = []
 
-for entrainement in range(2000):
+for entrainement in range(5000):
 
     # État initial des quantités (ex: chaque user a entre 0 et 700 unités)
     quantites_reelles = np.random.randint(0, 700, size=nbUsers).astype(float)
