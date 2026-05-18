@@ -1,0 +1,28 @@
+fig, ax = plt.subplots(figsize=(8, 5))
+
+x = range(len(regroupementTauxSucc))
+
+ax.plot(x, regroupementTauxSucc, color="blue", marker="o", label="Valeurs")
+
+z = np.polyfit(x, regroupementTauxSucc, 3)
+p = np.poly1d(z)
+x_smooth = np.linspace(x[0], x[-1], 300)  # Pour une courbe lisse
+ax.plot(x_smooth, p(x_smooth), color="red", linestyle="--", label="Tendance")
+
+equation = f"{z[0]:.2f}x³ + {z[1]:.2f}x² + {z[2]:.2f}x + {z[3]:.2f}"
+ax.text(0.05, 0.05, equation, transform=ax.transAxes,
+        fontsize=7, color="red", verticalalignment="bottom")
+
+ax.set_title("Mon graphe")
+ax.set_xlabel("Entrainements")
+ax.set_ylabel("Taux de succès")
+ax.legend()
+ax.grid(True)
+
+
+
+
+
+plt.tight_layout()
+#plt.savefig("graphesLR.jpg")
+plt.show()
