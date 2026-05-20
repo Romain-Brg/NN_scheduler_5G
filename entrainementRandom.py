@@ -58,7 +58,7 @@ for entrainement in range(20000):
         sumSNR = np.sum(snrs_reels)
 
         # 2. Normalisation pour le réseau (TRES IMPORTANT)
-        snrs_norm = snrs_reels / sumSNR
+        snrs_norm = snrs_reels / 20.0
         qtes_norm = quantites_reelles / sommeQte
 
         # 3. Construire le vecteur d'entrée [S1, Q1, S2, Q2...]
