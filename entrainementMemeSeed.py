@@ -67,7 +67,7 @@ def entrainementMEME_SEED(nbUsersParam, nbLayers, lr, qteMaxParam, nbEntrainemen
                 #print(f"{snrs_reels}")
                 # 2. Normalisation pour le réseau (TRES IMPORTANT)
                 snrs_norm = snrs_reels / 20.0
-                qtes_norm = quantites_reelles / 500.0
+                qtes_norm = quantites_reelles / qteMaxParam
                 # 3. Construire le vecteur d'entrée [S1, Q1, S2, Q2...]
                 inputs = np.empty(nbUsers*2)
                 inputs[0::2] = snrs_norm
