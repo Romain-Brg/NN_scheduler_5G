@@ -9,14 +9,14 @@ from network_v2 import Network_2
 
 
 # Initialisation
-nbUsers = 8
+nbUsers = 5
 vitesseInit = 0.01
 
 regroupementTauxSucc = []
 meanTauxSucc =[]
 stockageVitesses = []
 qteMAx = 2000
-net = Network_2(nbUsers=nbUsers, learning_rate=vitesseInit)
+net = Network(nbUsers=nbUsers, learning_rate=vitesseInit)
 
 
 #Boucle pour tester différentes valeurs de mon LR
@@ -29,7 +29,7 @@ net = Network_2(nbUsers=nbUsers, learning_rate=vitesseInit)
 
 tauxSuccesTot = []
 
-for entrainement in range(5000):
+for entrainement in range(80000):
 
     # État initial des quantités (ex: chaque user a entre 0 et 700 unités)
     quantites_reelles = np.random.randint(0, 700, size=nbUsers).astype(float)
