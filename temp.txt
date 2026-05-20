@@ -26,3 +26,80 @@ ax.grid(True)
 plt.tight_layout()
 #plt.savefig("graphesLR.jpg")
 plt.show()
+
+
+
+
+fig, ax = plt.subplots(figsize=(12, 5))
+
+# Aplatir tous les taux en une seule liste
+tous_les_taux = [val for groupe in regroupementTauxSucc for val in groupe]
+x_global = range(len(tous_les_taux))
+
+# Afficher tous les points
+ax.plot(x_global, tous_les_taux, color="blue", marker="o", 
+        markersize=2, label="taux succès", alpha=0.5)
+
+# Courbe de tendance recalculée tous les 1000 entrainements
+couleurs = ["red", "green", "orange", "purple", "brown"]
+offset = 0
+for i, groupe in enumerate(regroupementTauxSucc):
+    x_groupe = range(offset, offset + len(groupe))
+    
+    z = np.polyfit(x_groupe, groupe, 3)
+    p = np.poly1d(z)
+    x_smooth = np.linspace(x_groupe[0], x_groupe[-1], 300)
+    ax.plot(x_smooth, p(x_smooth), color=couleurs[i % len(couleurs)],
+            linestyle="--") #label=f"Tendance groupe {i+1} sigma : {np.nanstd(groupe)}
+    
+    offset += len(groupe)
+
+ax.set_title("Taux de succès par entrainement avec même SEED")
+ax.set_xlabel("Entrainements")
+ax.set_ylabel("Taux de succès")
+ax.legend()
+ax.grid(True)
+
+plt.tight_layout()
+#plt.savefig("graphe.pdf")
+plt.show()
+
+
+
+
+for v, iteration in enumerate(tabAffichage):  
+    # Aplatir tous les taux en une seule liste
+    tous_les_taux = [val for groupe in iteration for val in groupe]
+    x_global = range(len(tous_les_taux))
+    couleur = couleurs[v % len(couleurs)]
+    ax.plot(x_global, tous_les_taux, color=couleur, marker="o", 
+        markersize=2, label="taux succès", alpha=0.5)
+    
+    offset = 0
+    for i, groupe in enumerate(iteration):
+        x_groupe = range(offset, offset + len(groupe))
+        couleur = couleurs[i% len(couleurs)]
+        z = np.polyfit(x_groupe, groupe, 3)
+        p = np.poly1d(z)
+        x_smooth = np.linspace(x_groupe[0], x_groupe[-1], 300)
+        ax.plot(x_smooth, p(x_smooth), color=couleur, linestyle="--", alpha=0.8)
+         #label=f"Tendance groupe {i+1} sigma : {np.nanstd(groupe)}
+        
+        offset += len(groupe)
+
+ax.set_title("Taux de succès par entrainement avec même SEED")
+ax.set_xlabel("Entrainements")
+ax.set_ylabel("Taux de succès")
+ax.legend()
+ax.grid(True)
+
+
+
+# Afficher tous les points
+
+
+# Courbe de tendance recalculée tous les 1000 entrainements
+
+plt.tight_layout()
+#plt.savefig("graphe.pdf")
+plt.show()

@@ -18,11 +18,12 @@ class Network_2:
     def __init__(self, nbUsers, learning_rate=0.1):
         self.nbUsers = nbUsers
         self.lr = learning_rate
+        self.nbLayers = 2
         
         # Dimensions
         self.input_size = nbUsers * 2
-        self.hidden_1_size = nbUsers * 4
-        self.hidden_2_size = nbUsers * 4
+        self.hidden_1_size = nbUsers * 8
+        self.hidden_2_size = nbUsers * 8
         self.output_size = nbUsers + 1
         
         # Initialisation des poids (Matrices) et biais (Vecteurs)

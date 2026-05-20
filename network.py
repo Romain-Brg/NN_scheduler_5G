@@ -25,6 +25,7 @@ class Network:
     def __init__(self, nbUsers, learning_rate=0.1):
         self.nbUsers = nbUsers
         self.lr = learning_rate
+        self.nbLayers = 1
         
         # Dimensions
         self.input_size = nbUsers * 2
