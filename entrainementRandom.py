@@ -9,14 +9,14 @@ from network_v2 import Network_2
 
 
 # Initialisation
-nbUsers = 8
+nbUsers = 6
 vitesseInit = 0.01
 
 regroupementTauxSucc = []
 meanTauxSucc =[]
 stockageVitesses = []
 qteMAx = 2000
-net = Network_2(nbUsers=8,learning_rate=0.01)
+net = Network_2(nbUsers=6,learning_rate=0.01)
 
 
 #Boucle pour tester différentes valeurs de mon LR
@@ -121,7 +121,7 @@ for entrainement in range(20000):
         if(freinage >5): break
 
 
-    if entrainement % 1000 == 999:  # tous les 1000 entrainements
+    if entrainement % 100 == 99:  # tous les 1000 entrainements
         regroupementTauxSucc.append(tauxSuccesTot.copy())
         tauxSuccesTot = []
 
@@ -162,7 +162,7 @@ for i, groupe in enumerate(regroupementTauxSucc):
     
     offset += len(groupe)
 
-ax.set_title("Taux de succès par entrainement")
+ax.set_title(f"Taux de succès par entrainement avec valeur moy en fin : {np.mean(p(x_smooth))}")
 ax.set_xlabel("Entrainements")
 ax.set_ylabel("Taux de succès")
 ax.legend()
