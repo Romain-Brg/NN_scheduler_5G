@@ -29,7 +29,7 @@ class Network:
         
         # Dimensions
         self.input_size = nbUsers * 2
-        self.hidden_size = nbUsers * 3
+        self.hidden_size = nbUsers * 4
         self.output_size = nbUsers + 1
         
         # Initialisation des poids (Matrices) et biais (Vecteurs)

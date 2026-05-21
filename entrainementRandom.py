@@ -9,15 +9,16 @@ from network_v2 import Network_2
 
 
 # Initialisation
-nbUsers = 6
+
 vitesseInit = 0.01
+entrainementMax = 15000
 
 regroupementTauxSucc = []
 meanTauxSucc =[]
 stockageVitesses = []
 qteMAx = 2000
-net = Network_2(nbUsers=6,learning_rate=0.01)
-
+net = Network_2(nbUsers=6,learning_rate=0.02)
+nbUsers = net.nbUsers
 
 #Boucle pour tester différentes valeurs de mon LR
 #for vitesse in np.linspace(vitesseInit, 0.06, 6):
@@ -29,7 +30,7 @@ net = Network_2(nbUsers=6,learning_rate=0.01)
 
 tauxSuccesTot = []
 
-for entrainement in range(20000):
+for entrainement in range(entrainementMax + 2000):
 
     # État initial des quantités (ex: chaque user a entre 0 et 700 unités)
     quantites_reelles = np.random.randint(0, 700, size=nbUsers).astype(float)
@@ -59,7 +60,7 @@ for entrainement in range(20000):
 
         # 2. Normalisation pour le réseau (TRES IMPORTANT)
         snrs_norm = snrs_reels / 20.0
-        qtes_norm = quantites_reelles / sommeQte
+        qtes_norm = quantites_reelles / 700.0
 
         # 3. Construire le vecteur d'entrée [S1, Q1, S2, Q2...]
         inputs = np.empty(nbUsers*2)
@@ -121,13 +122,19 @@ for entrainement in range(20000):
         if(freinage >5): break
 
 
-    if entrainement % 100 == 99:  # tous les 1000 entrainements
+    if entrainement % 1000 == 999:  # tous les 1000 entrainements
         regroupementTauxSucc.append(tauxSuccesTot.copy())
         tauxSuccesTot = []
 
+    paliers = [int(entrainementMax * p) for p in [0.80,0.85,0.90,0.95]]
+
+    if entrainement in paliers:
+        net.updateLR(newLR=net.lr / 2.0)
+        print(f"Palier {entrainement} : nouveau LR = {net.lr}")
+
     tauxSuccesTot.append(taux_global)
 
-    #print(f"tadaaaaa pour entrainement numero {entrainement}, taux de succès global : {taux_global}")
+        #print(f"tadaaaaa pour entrainement numero {entrainement}, taux de succès global : {taux_global}")
 
 
 
