@@ -118,3 +118,16 @@ class Network:
             target[best_user] = 1.0
 
         return target
+    
+    def save_NN(self, filepath="poids.npz"):
+        np.savez(filepath, W1=self.W1, b1=self.b1, W2=self.W2, b2=self.b2)
+        print(f"Poids sauvegardé dans {filepath}")
+
+    def load_NN(self, filepath="poids.npz"):
+        data = np.load(filepath)
+        self.W1 = data['W1']
+        self.b1 = data['b1']
+        self.W2 = data['W2']
+        self.b2 = data['b2']
+
+        print("poids chargés")

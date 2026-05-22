@@ -11,13 +11,13 @@ from network_v2 import Network_2
 # Initialisation
 
 vitesseInit = 0.01
-entrainementMax = 15000
+entrainementMax = 20000
 
 regroupementTauxSucc = []
-meanTauxSucc =[]
+meanTauxSucc = []
 stockageVitesses = []
 qteMAx = 2000
-net = Network_2(nbUsers=6,learning_rate=0.02)
+net = Network_2(nbUsers=8,learning_rate=0.02)
 nbUsers = net.nbUsers
 
 #Boucle pour tester différentes valeurs de mon LR
@@ -29,8 +29,7 @@ nbUsers = net.nbUsers
 
 
 tauxSuccesTot = []
-
-for entrainement in range(entrainementMax + 2000):
+for entrainement in range(entrainementMax + int(entrainementMax/10)):
 
     # État initial des quantités (ex: chaque user a entre 0 et 700 unités)
     quantites_reelles = np.random.randint(0, 700, size=nbUsers).astype(float)
@@ -126,7 +125,7 @@ for entrainement in range(entrainementMax + 2000):
         regroupementTauxSucc.append(tauxSuccesTot.copy())
         tauxSuccesTot = []
 
-    paliers = [int(entrainementMax * p) for p in [0.80,0.85,0.90,0.95]]
+    paliers = [int(entrainementMax * p) for p in [0.75,0.80,0.85,0.90,0.95]]
 
     if entrainement in paliers:
         net.updateLR(newLR=net.lr / 2.0)
@@ -143,7 +142,7 @@ meanTauxSucc.append(round(np.mean(tauxSuccesTot),3))
 print(f"Taux de succès moyen suite à {entrainement +1} entrainements : {np.mean(tauxSuccesTot)} pour un LR de {net.lr}"
       f"\n avec comme ecart-type {np.nanstd(tauxSuccesTot)} ")
 
-
+net.save_NN("NN_2Layer4-2_8U.npz")
 
 fig, ax = plt.subplots(figsize=(12, 5))
 
@@ -169,7 +168,7 @@ for i, groupe in enumerate(regroupementTauxSucc):
     
     offset += len(groupe)
 
-ax.set_title(f"Taux de succès par entrainement avec valeur moy en fin : {np.mean(p(x_smooth))}")
+ax.set_title(f"Taux de succès par entrainement avec valeur moy en fin : {np.round(np.mean(p(x_smooth)),2)} et les paliesz : {paliers} ")
 ax.set_xlabel("Entrainements")
 ax.set_ylabel("Taux de succès")
 ax.legend()
