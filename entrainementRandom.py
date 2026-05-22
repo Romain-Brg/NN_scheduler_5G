@@ -11,13 +11,14 @@ from network_v2 import Network_2
 # Initialisation
 
 vitesseInit = 0.01
-entrainementMax = 20000
+entrainementMax = 5000
 
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 qteMAx = 2000
-net = Network_2(nbUsers=8,learning_rate=0.02)
+net = Network_2(nbUsers=8,learning_rate=0.0025)
+net.load_NN("NN_2Layer4-2_8U.npz")
 nbUsers = net.nbUsers
 
 #Boucle pour tester différentes valeurs de mon LR
@@ -88,11 +89,11 @@ for entrainement in range(entrainementMax + int(entrainementMax/10)):
         if is_success: total_successes += 1
 
         # 3b. On garde seulement les 'window_size' derniers résultats pour le taux glissant
-        if len(success_history) > window_size:
-            success_history.pop(0)
+        # if len(success_history) > window_size:
+        #     success_history.pop(0)
 
         # 4b. Calcul des statistiques
-        taux_glissant = (sum(success_history) / len(success_history)) * 100
+        #taux_glissant = (sum(success_history) / len(success_history)) * 100
         taux_global = (total_successes / total_attempts) * 100
 
         # # 5b. Affichage périodique (tous les 50 tours par exemple)
@@ -125,11 +126,11 @@ for entrainement in range(entrainementMax + int(entrainementMax/10)):
         regroupementTauxSucc.append(tauxSuccesTot.copy())
         tauxSuccesTot = []
 
-    paliers = [int(entrainementMax * p) for p in [0.75,0.80,0.85,0.90,0.95]]
+    paliers = [int(entrainementMax * p) for p in [0.75,0.80,0.85,0.90]]
 
-    if entrainement in paliers:
-        net.updateLR(newLR=net.lr / 2.0)
-        print(f"Palier {entrainement} : nouveau LR = {net.lr}")
+    # if entrainement in paliers:
+    #     net.updateLR(newLR=net.lr / 1.25)
+    #     print(f"Palier {entrainement} : nouveau LR = {net.lr}")
 
     tauxSuccesTot.append(taux_global)
 
