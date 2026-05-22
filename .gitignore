@@ -2,4 +2,4 @@
 __pycache__
 graphe.pdf
 temp.txt
-*.npz
+.npz
