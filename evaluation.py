@@ -13,12 +13,12 @@ from network_v2 import Network_2
 # Initialisation
 
 vitesseInit = 0.01
-stepMax = 1000
+stepMax = 2000
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
-net = Network(nbUsers=4,learning_rate=0.01)
-net.load_NN("NN_1Layer4_4U_real.npz")
+net = Network_2(nbUsers=4,learning_rate=0.01)
+net.load_NN("NN_2Layer4-2_4U_real_Best.npz")
 nbUsers = net.nbUsers
 
 
