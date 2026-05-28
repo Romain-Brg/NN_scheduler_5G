@@ -2,6 +2,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 from network import Network
 from network_v2 import Network_2
 
@@ -11,13 +12,13 @@ from network_v2 import Network_2
 # Initialisation
 
 vitesseInit = 0.01
-
+stepMax = 100000
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 qteMAx = 2000
-net = Network_2(nbUsers=6,learning_rate=0.0005)
-net.load_NN("NN_2Layer4-2_4U_real.npz")
+net = Network(nbUsers=4,learning_rate=0.01)
+#net.load_NN("NN_1Layer4_4U_real.npz")
 nbUsers = net.nbUsers
 
 #Boucle pour tester différentes valeurs de mon LR
@@ -40,6 +41,8 @@ gravites_Erreurs = []
 
 
 
+
+
 # État initial des quantités (ex: chaque user a entre 0 et 700 unités)
 quantites_reelles = np.random.randint(0, 700, size=nbUsers).astype(float)
 sommeQte= 700.0
@@ -59,7 +62,7 @@ total_attempts = 0
 erreurTic = []
 
 
-for step in range(2000000):
+for step in range(stepMax):
 
     # 1. Générer des SNR aléatoires (ex: entre 0 et 20)
     snrs_reels = np.random.uniform(0, 20, size=nbUsers)
@@ -96,7 +99,6 @@ for step in range(2000000):
     else: 
         is_success = 0
         taux_N_eluErreur[choix_reseau] += 1.0
-
         #print(f"{prediction}")
 
     success_history.append(is_success)
@@ -130,6 +132,7 @@ for step in range(2000000):
     if step % 1000 == 999:
         regroupementTauxSucc.append(np.mean(success_history)*100)
         success_history = []
+        # Sauvegarde des erreurs
 
     
     
@@ -142,7 +145,7 @@ for step in range(2000000):
 print(f"Taux de succès moyen suite à {step +1} tics : {np.mean(regroupementTauxSucc)} pour un LR de {net.lr}"
       f"\n avec comme ecart-type {np.nanstd(regroupementTauxSucc)} ")
 
-net.save_NN("NN_2Layer4-2_4U_real.npz")
+net.save_NN("NN_1Layer4_4U_real.npz")
 
 fig, ax = plt.subplots(figsize=(12, 5))
 
