@@ -1,3 +1,19 @@
+NbE / Nb-devraitE : [0.02128859 0.02278134 0.02267605 0.02118815 0.00302398]
+NbE_succes / Nb-devraitE : [0.97764212 0.97269498 0.97796518 0.97620718 1.        ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 fig, ax = plt.subplots(figsize=(8, 5))
 
 x = range(len(regroupementTauxSucc))

@@ -11,14 +11,14 @@ from network_v2 import Network_2
 # Initialisation
 
 vitesseInit = 0.01
-entrainementMax = 1000
+entrainementMax = 5000
 
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 qteMAx = 2000
-net = Network_2(nbUsers=4,learning_rate=0.01)
-#net.load_NN("NN_2Layer4-2_4U.npz")
+net = Network_2(nbUsers=4,learning_rate=0.0005)
+net.load_NN("NN_2Layer4-2_4U.npz")
 nbUsers = net.nbUsers
 
 #Boucle pour tester différentes valeurs de mon LR
@@ -33,15 +33,19 @@ tauxSuccesTot = []
 
 #Calcul des taux pour les neurones
 taux_N_eluSucces = np.zeros(nbUsers + 1)
-taux_N_elu = np.zeros(nbUsers + 1)
+taux_N_eluErreur = np.zeros(nbUsers + 1)
 taux_N_oracle = np.zeros(nbUsers + 1)
+
+#gravité erreur
+
+gravites_Erreurs = []
 
 for entrainement in range(entrainementMax + int(entrainementMax/10)):
 
     # État initial des quantités (ex: chaque user a entre 0 et 700 unités)
     quantites_reelles = np.random.randint(0, 700, size=nbUsers).astype(float)
 
-    sommeQte= np.sum(quantites_reelles)
+    sommeQte= 700.0
     
     # quantites_reelles = []
     # for i in range(nbUsers):
@@ -58,6 +62,8 @@ for entrainement in range(entrainementMax + int(entrainementMax/10)):
     total_successes = 0
     total_attempts = 0
 
+    erreurTic = []
+
 
     for step in range(3000):
         # 1. Générer des SNR aléatoires (ex: entre 0 et 20)
@@ -66,7 +72,7 @@ for entrainement in range(entrainementMax + int(entrainementMax/10)):
 
         # 2. Normalisation pour le réseau (TRES IMPORTANT)
         snrs_norm = snrs_reels / 20.0
-        qtes_norm = quantites_reelles / 700.0
+        qtes_norm = quantites_reelles / sommeQte
 
         # 3. Construire le vecteur d'entrée [S1, Q1, S2, Q2...]
         inputs = np.empty(nbUsers*2)
@@ -88,18 +94,29 @@ for entrainement in range(entrainementMax + int(entrainementMax/10)):
         choix_reseau = np.argmax(prediction)
         choix_oracle = np.argmax(target)
 
+       
+        
         taux_N_oracle[choix_oracle] += 1.0
-        taux_N_elu[choix_reseau] += 1.0
 
         # 2b. On compare
         if choix_reseau == choix_oracle:
+            #print(f"{prediction}")
+            #print(f"{target}")
             is_success = 1
             total_successes += 1 
             success_history.append(is_success)
             taux_N_eluSucces[choix_reseau] += 1
-        else: is_success = 0 
+
+        else: 
+            is_success = 0
+            taux_N_eluErreur[choix_reseau] += 1.0
+ 
+            #print(f"{prediction}")
         
         total_attempts += 1
+        classementInputs = net.get_Tab_erreur(inputs, nbUsers)
+        #print(f"Les classements sont : {classementInputs}")
+        erreurTic.append(classementInputs[choix_reseau])
         
 
         # 3b. On garde seulement les 'window_size' derniers résultats pour le taux glissant
@@ -129,16 +146,20 @@ for entrainement in range(entrainementMax + int(entrainementMax/10)):
 
         #print(f"Step:{step} - Choix Oracle: {choix} - Choix NN :  {choix_reseau} - \n Qtes initiales normalisées : {qtes_norm} - SNR inital: {np.trunc(snrs_reels)} Qtes restantes: {quantites_reelles}")
 
-        if(np.allclose(quantites_reelles, 0)):freinage += 1
+        if(np.allclose(quantites_reelles, 0)):freinage += 1    
 
 
+        if(freinage > 12): break
 
-        if(freinage >5): break
+    gravites_Erreurs.append(np.mean(erreurTic))
 
 
     if entrainement % 100 == 99:  # tous les 1000 entrainements
         regroupementTauxSucc.append(tauxSuccesTot.copy())
         tauxSuccesTot = []
+
+        
+
 
     #paliers = [int(entrainementMax * p) for p in [0.75,0.80,0.85,0.90]]
 
@@ -196,7 +217,7 @@ ax.grid(True)
 fig2, (ax2, ax3) = plt.subplots(1, 2, figsize=(14, 5), sharey=True)
 
 
-resultat1 = taux_N_elu / taux_N_oracle
+resultat1 = taux_N_eluErreur / taux_N_oracle
 print(f"NbE / Nb-devraitE : {resultat1}")
 
 ax2.bar(range(len(resultat1)), resultat1, color="blue", alpha=0.7)
@@ -215,6 +236,17 @@ ax3.set_title("Nb fois elu succès par le NN / nb fois de l'oracle")
 ax3.set_xlabel("Neurone")
 ax3.set_ylabel("Taux")
 ax3.grid(True, axis="y")
+
+"""graphe sur les erreurs"""
+fig3, ax4 = plt.subplots(figsize=(12, 5))
+
+ax4.plot(gravites_Erreurs, color="purple", marker="o", 
+        markersize=2, label="Erreurs", alpha=0.5)
+
+ax4.set_title(f"Evolution du degré de gravité des erreurs au cours des tics")
+ax4.set_xlabel("Tics")
+ax4.set_ylabel("Gravité")
+
 
 plt.tight_layout()
 #plt.savefig("graphe.pdf")
