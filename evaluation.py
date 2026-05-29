@@ -18,7 +18,7 @@ regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 net = Network_2(nbUsers=4,learning_rate=0.01)
-net.load_NN("NN_2Layer4-2_4U_real_Best_Affine.npz")
+net.load_NN("NN_2Layer4-2_4U_real_V2.npz")
 nbUsers = net.nbUsers
 
 
@@ -39,6 +39,13 @@ gravites_Erreurs = []
 fichier_erreurs = f"erreurs_{net.nbLayers}midLayer_nbUser{net.nbUsers}_Affine.json"
 erreurs = []
 
+
+#taux de bits transmis
+
+tauxBits_transmis_Oracle = []
+tauxBits_transmis_NN = []
+
+tauxbits_transmis = []
 
 
 # État initial des quantités (ex: chaque user a entre 0 et 700 unités)
@@ -82,8 +89,7 @@ for step in range(stepMax):
    
     
     total_attempts += 1
-    classementInputs = net.get_Tab_erreur(inputs, nbUsers)
-    erreurTic.append(classementInputs[choix_reseau])
+    
 
     taux_N_oracle[choix_oracle] += 1.0
     # 2b. On compare
@@ -97,7 +103,9 @@ for step in range(stepMax):
     else: 
         is_success = 0
         taux_N_eluErreur[choix_reseau] += 1.0
-    
+
+        classementInputs = net.get_Tab_erreur(inputs, nbUsers)
+        erreurTic.append(classementInputs[choix_reseau])
         #Stockage de l'erreur
         erreur = {
             "step": int(step),
@@ -114,19 +122,25 @@ for step in range(stepMax):
     success_history.append(is_success)
     
     total_attempts += 1
-    classementInputs = net.get_Tab_erreur(inputs, nbUsers)
-    erreurTic.append(classementInputs[choix_reseau])
     
 
     """Fin calcul taux"""
+    if(choix_oracle < nbUsers):
+        tauxBits_transmis_Oracle.append(snrs_reels[choix_oracle])
+    else:
+        tauxBits_transmis_Oracle.append(0)
+
+    if(choix_reseau < nbUsers and quantites_reelles[choix_reseau] > 0):
+        tauxBits_transmis_NN.append(snrs_reels[choix_reseau])
+    else:
+        tauxBits_transmis_NN.append(0)
 
 
     # 6. Action : On baisse la quantité de l'utilisateur choisi par l'ORACLE 
     choix = np.argmax(target)
     if choix < nbUsers: # Si ce n'est pas le neurone de repos
-        quantites_reelles[choix] -= 10 # On consomme de la data
+        quantites_reelles[choix] -= snrs_reels[choix_oracle] # On consomme de la data
         if quantites_reelles[choix] < 0: quantites_reelles[choix] = 0
-    #print(f"Step:{step} - Choix Oracle: {choix} - Choix NN :  {choix_reseau} - \n Qtes initiales normalisées : {qtes_norm} - SNR inital: {np.trunc(snrs_reels)} Qtes restantes: {quantites_reelles}")
     
 
     
@@ -139,6 +153,12 @@ for step in range(stepMax):
         erreurTic =[]
 
     if step % 100 == 99:
+
+        tauxbits_transmis.append((np.sum(tauxBits_transmis_NN)/ np.sum(tauxBits_transmis_Oracle))*100)
+        tauxBits_transmis_Oracle = []
+        tauxBits_transmis_NN = []
+
+
         regroupementTauxSucc.append(np.mean(success_history)*100)
         success_history = []
         # Sauvegarde des erreurs
@@ -222,6 +242,20 @@ ax4.plot(gravites_Erreurs, color="purple", marker="o",
 ax4.set_title(f"Evolution du degré de gravité des erreurs au cours des tics")
 ax4.set_xlabel("Tics")
 ax4.set_ylabel("Gravité")
+
+
+
+"""graphe sur transmssion de bits"""
+fig4, ax5 = plt.subplots(figsize=(12, 5))
+
+
+ax5.plot(tauxbits_transmis, color="blue", marker="o", 
+        markersize=2, label="bits_transmis", alpha=0.5)
+
+ax5.set_title(f"Evolution des bits transmis cours des tics tt les 100 tics")
+ax5.set_xlabel("Tics")
+ax5.set_ylabel("taux de transmissions")
+
 
 
 plt.tight_layout()

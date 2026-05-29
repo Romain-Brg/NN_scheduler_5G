@@ -7,8 +7,8 @@ from network import Network
 from network_v2 import Network_2
 
 
-"""TODO changer les valeurs attribuées QTES ou SNRS pour entrainer sur les cas particulier
-        Il y a donc un LR bas pour pouvoir faire de petit changement"""
+#TODO changer les valeurs attribuées QTES ou SNRS pour entrainer sur les cas particulier
+#        Il y a donc un LR bas pour pouvoir faire de petit changement"""
 
 # Initialisation
 

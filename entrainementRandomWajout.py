@@ -12,13 +12,13 @@ from network_v2 import Network_2
 # Initialisation
 
 vitesseInit = 0.01
-stepMax = 1000000
+stepMax = 2000000
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 qteMAx = 2000
-net = Network_2(nbUsers=4,learning_rate=0.01)
-#net.load_NN("NN_1Layer4_4U_real.npz")
+net = Network_2(nbUsers=4,learning_rate=0.005)
+net.load_NN("NN_2Layer2-4_4U_real_V2.npz")
 nbUsers = net.nbUsers
 
 #Boucle pour tester différentes valeurs de mon LR
@@ -99,14 +99,14 @@ for step in range(stepMax):
     else: 
         is_success = 0
         taux_N_eluErreur[choix_reseau] += 1.0
+        classementInputs = net.get_Tab_erreur(inputs, nbUsers)
+        erreurTic.append(classementInputs[choix_reseau])
         #print(f"{prediction}")
 
     success_history.append(is_success)
     
     total_attempts += 1
-    classementInputs = net.get_Tab_erreur(inputs, nbUsers)
-    #print(f"Les classements sont : {classementInputs}")
-    erreurTic.append(classementInputs[choix_reseau])
+    
     
 
     """Fin calcul taux"""
@@ -145,7 +145,7 @@ for step in range(stepMax):
 print(f"Taux de succès moyen suite à {step +1} tics : {np.mean(regroupementTauxSucc)} pour un LR de {net.lr}"
       f"\n avec comme ecart-type {np.nanstd(regroupementTauxSucc)} ")
 
-net.save_NN("NN_2Layer2-1_4U_real.npz")
+net.save_NN("NN_2Layer2-4_4U_real_V2.npz")
 
 fig, ax = plt.subplots(figsize=(12, 5))
 
