@@ -1,5 +1,38 @@
+Projet visant à faire un réseau de neurone pour imiter un scheduler d'antenne 5G.
+
+Plusieurs configurations sont testées notamment en changeant le nombre de couches intermédiaires ainsi que leur tailles(nb neurnones par couche)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # NN_Stage_L3
-oullaaaaaaaaaaaaaaaaaaaaa testtst
 
 
 ## Getting started

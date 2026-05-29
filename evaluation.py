@@ -17,8 +17,8 @@ stepMax = 2000
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
-net = Network_2(nbUsers=4,learning_rate=0.01)
-net.load_NN("NN_2Layer4-2_4U_real_Best.npz")
+net = Network(nbUsers=4,learning_rate=0.01)
+net.load_NN("NN_1Layer4_4U_real_best.npz")
 nbUsers = net.nbUsers
 
 
@@ -103,7 +103,7 @@ for step in range(stepMax):
             "step": int(step),
             "choix_reseau": int(choix_reseau),
             "choix_oracle": int(choix_oracle),
-            "gravite erreur": int(classementInputs[choix_reseau]),
+            "gravite_erreur": int(classementInputs[choix_reseau]),
             "snrs": snrs_reels.tolist(),
             "quantites": quantites_reelles.tolist(),
             "valeurs_neurones_sortie": prediction.flatten().tolist()

@@ -1,8 +1,9 @@
 .venv
-__pycache__
-graphe.pdf
-temp.txt
+*.pdf
 *.npz
 resultatPresentation.zip
 convertisseurJSONtoCSV.py
+*.csv 
+temp.txt
 
+__pycache__
