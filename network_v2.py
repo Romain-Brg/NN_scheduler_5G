@@ -22,8 +22,8 @@ class Network_2:
         
         # Dimensions
         self.input_size = nbUsers * 2
-        self.hidden_1_size = nbUsers * 4
-        self.hidden_2_size = nbUsers * 2
+        self.hidden_1_size = nbUsers * 2
+        self.hidden_2_size = nbUsers * 1
         self.output_size = nbUsers + 1
         
         # Initialisation des poids (Matrices) et biais (Vecteurs)
@@ -132,7 +132,7 @@ class Network_2:
 
         #print(f"les SNRS : {snrs} \n les qtes : {qtes}")
 
-        if np.allclose(qtes, 0):
+        if np.allclose(qtes, 0.0):
         # Classement par ordre de snrs (max → 0)
             ordre = np.argsort(snrs)[::-1]
             rangs = np.empty(nbUsers, dtype=int)
@@ -142,8 +142,8 @@ class Network_2:
 
    
         else:
-            avec_qtes = np.where(qtes > 0)[0]   # indices des users avec qtes
-            sans_qtes = np.where(qtes == 0)[0]  # indices des users sans qtes
+            avec_qtes = np.where(qtes > 0.0)[0]   # indices des users avec qtes
+            sans_qtes = np.where(qtes == 0.0)[0]  # indices des users sans qtes
 
             # Classement des users avec qtes par ordre de snrs
             ordre_avec = avec_qtes[np.argsort(snrs[avec_qtes])[::-1]]

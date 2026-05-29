@@ -17,8 +17,8 @@ stepMax = 2000
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
-net = Network(nbUsers=4,learning_rate=0.01)
-net.load_NN("NN_1Layer4_4U_real_best.npz")
+net = Network_2(nbUsers=4,learning_rate=0.01)
+net.load_NN("NN_2Layer4-2_4U_real_Best_Affine.npz")
 nbUsers = net.nbUsers
 
 
@@ -36,7 +36,7 @@ gravites_Erreurs = []
 
 #stocckage erreurs
 
-fichier_erreurs = f"erreurs_{net.nbLayers}midLayer_nbUser{net.nbUsers}.json"
+fichier_erreurs = f"erreurs_{net.nbLayers}midLayer_nbUser{net.nbUsers}_Affine.json"
 erreurs = []
 
 

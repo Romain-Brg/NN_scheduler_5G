@@ -12,12 +12,12 @@ from network_v2 import Network_2
 # Initialisation
 
 vitesseInit = 0.01
-stepMax = 100000
+stepMax = 1000000
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 qteMAx = 2000
-net = Network(nbUsers=4,learning_rate=0.01)
+net = Network_2(nbUsers=4,learning_rate=0.01)
 #net.load_NN("NN_1Layer4_4U_real.npz")
 nbUsers = net.nbUsers
 
@@ -115,7 +115,7 @@ for step in range(stepMax):
     # 6. Action : On baisse la quantité de l'utilisateur choisi par l'ORACLE 
     choix = np.argmax(target)
     if choix < nbUsers: # Si ce n'est pas le neurone de repos
-        quantites_reelles[choix] -= 10 # On consomme de la data
+        quantites_reelles[choix] -= snrs_reels[choix_oracle] # On consomme de la data
         if quantites_reelles[choix] < 0: quantites_reelles[choix] = 0
     #print(f"Step:{step} - Choix Oracle: {choix} - Choix NN :  {choix_reseau} - \n Qtes initiales normalisées : {qtes_norm} - SNR inital: {np.trunc(snrs_reels)} Qtes restantes: {quantites_reelles}")
     
@@ -145,7 +145,7 @@ for step in range(stepMax):
 print(f"Taux de succès moyen suite à {step +1} tics : {np.mean(regroupementTauxSucc)} pour un LR de {net.lr}"
       f"\n avec comme ecart-type {np.nanstd(regroupementTauxSucc)} ")
 
-net.save_NN("NN_1Layer4_4U_real.npz")
+net.save_NN("NN_2Layer2-1_4U_real.npz")
 
 fig, ax = plt.subplots(figsize=(12, 5))
 
