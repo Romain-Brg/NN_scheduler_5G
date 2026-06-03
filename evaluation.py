@@ -17,8 +17,8 @@ stepMax = 2000
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
-net = Network_2(nbUsers=4,learning_rate=0.01)
-net.load_NN("NN_2Layer4-2_4U_real_V2.npz")
+net = Network(nbUsers=4,learning_rate=0.01)
+net.load_NN("NN_1Layer_2_4U_real_V2.npz")
 nbUsers = net.nbUsers
 
 
@@ -36,7 +36,7 @@ gravites_Erreurs = []
 
 #stocckage erreurs
 
-fichier_erreurs = f"erreurs_{net.nbLayers}midLayer_nbUser{net.nbUsers}_Affine.json"
+fichier_erreurs = f"erreurs_{net.nbLayers}midLayer{net.hidden_size}_nbUser{net.nbUsers}_Affine.json"
 erreurs = []
 
 
@@ -47,11 +47,18 @@ tauxBits_transmis_NN = []
 
 tauxbits_transmis = []
 
+#bits demandes
+
+qteBits_tab_demandes = []
+qteBits_tab_Transmis = []
+qteBits_demandes = 0
+qteBits_Transmis = 0
 
 # État initial des quantités (ex: chaque user a entre 0 et 700 unités)
 quantites_reelles = np.random.randint(0, 700, size=nbUsers).astype(float)
 sommeQte= 700.0
-
+qteBits_demandes += np.sum(quantites_reelles)
+qteBits_tab_demandes.append(qteBits_demandes)
 
 freinage = 0
 window_size = 100
@@ -132,8 +139,12 @@ for step in range(stepMax):
 
     if(choix_reseau < nbUsers and quantites_reelles[choix_reseau] > 0):
         tauxBits_transmis_NN.append(snrs_reels[choix_reseau])
+        qteBits_Transmis += snrs_reels[choix_reseau]
+        qteBits_tab_Transmis.append(qteBits_Transmis)
     else:
         tauxBits_transmis_NN.append(0)
+        qteBits_Transmis += 0
+        qteBits_tab_Transmis.append(qteBits_Transmis)
 
 
     # 6. Action : On baisse la quantité de l'utilisateur choisi par l'ORACLE 
@@ -149,11 +160,15 @@ for step in range(stepMax):
         #ajout de qte (+ réaliste)
         quantites_reelles += np.random.randint(0, 300, size=nbUsers).astype(float)
         sommeQte= np.sum(quantites_reelles)
+        
+        #qteBits_tab_demandes.append(qteBits_demandes)
+        qteBits_demandes += np.sum(quantites_reelles)
+
+    qteBits_tab_demandes.append(qteBits_demandes)
+
+    if step % 20 == 19:
         gravites_Erreurs.append(np.mean(erreurTic))
         erreurTic =[]
-
-    if step % 100 == 99:
-
         tauxbits_transmis.append((np.sum(tauxBits_transmis_NN)/ np.sum(tauxBits_transmis_Oracle))*100)
         tauxBits_transmis_Oracle = []
         tauxBits_transmis_NN = []
@@ -256,6 +271,19 @@ ax5.set_title(f"Evolution des bits transmis cours des tics tt les 100 tics")
 ax5.set_xlabel("Tics")
 ax5.set_ylabel("taux de transmissions")
 
+
+
+"""graphe sur les quantités de bits transmises"""
+
+print(f"{qteBits_Transmis}")
+
+fig5, ax6 = plt.subplots(figsize=(12, 5))
+
+ax6.plot(qteBits_tab_demandes,color='blue',label='quantités demandées')
+ax6.plot(qteBits_tab_Transmis, color='green',label='quantités bits transmises')
+ax6.set_title("Comparaison entre les bits transmis (vert) et les bits demandés (bleu)")
+ax6.set_xlabel("Tics")
+ax6.set_ylabel("quantités transmises")
 
 
 plt.tight_layout()

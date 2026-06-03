@@ -17,8 +17,8 @@ regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 qteMAx = 2000
-net = Network_2(nbUsers=4,learning_rate=0.005)
-net.load_NN("NN_2Layer2-4_4U_real_V2.npz")
+net = Network(nbUsers=4,learning_rate=0.0000125)
+net.load_NN("NN_1Layer_2_4U_real_V2.npz")
 nbUsers = net.nbUsers
 
 #Boucle pour tester différentes valeurs de mon LR
@@ -61,7 +61,7 @@ total_successes = 0
 total_attempts = 0
 erreurTic = []
 
-
+nbErreur = 0
 for step in range(stepMax):
 
     # 1. Générer des SNR aléatoires (ex: entre 0 et 20)
@@ -98,8 +98,12 @@ for step in range(stepMax):
         taux_N_eluSucces[choix_reseau] += 1
     else: 
         is_success = 0
+        nbErreur += 1
         taux_N_eluErreur[choix_reseau] += 1.0
         classementInputs = net.get_Tab_erreur(inputs, nbUsers)
+        # print(f"\nSNRS : {inputs[0::2]} ; QTES {inputs[1::2]}")
+        # print(f"Oracle :{target} ; Prediction NN : {prediction}")
+        # print(f"classement :{classementInputs}")
         erreurTic.append(classementInputs[choix_reseau])
         #print(f"{prediction}")
 
@@ -143,9 +147,15 @@ for step in range(stepMax):
 
     
 print(f"Taux de succès moyen suite à {step +1} tics : {np.mean(regroupementTauxSucc)} pour un LR de {net.lr}"
-      f"\n avec comme ecart-type {np.nanstd(regroupementTauxSucc)} ")
+      f"\n avec comme ecart-type {np.nanstd(regroupementTauxSucc)} et avec {nbErreur} erreurs faites ")
 
-net.save_NN("NN_2Layer2-4_4U_real_V2.npz")
+
+net.save_NN("NN_1Layer_2_4U_real_V2.npz")
+
+
+
+
+"""calcul des graphes"""
 
 fig, ax = plt.subplots(figsize=(12, 5))
 
