@@ -94,7 +94,7 @@ class Network:
 
     def get_oracle_target(self, inputs, nbUsers):
     # On sépare les SNR et les Quantités
-        snrs = inputs[0::2]  # Prend les indices 0, 2, 4, 6
+        snrs = inputs[0::2].copy()  # Prend les indices 0, 2, 4, 6
         qtes = inputs[1::2]  # Prend les indices 1, 3, 5, 7
 
         target = np.zeros(nbUsers + 1) # [0, 0, 0, 0, 0]
@@ -125,7 +125,7 @@ class Network:
     
     def get_Tab_erreur(self, inputs, nbUsers):
         resultat = np.empty(nbUsers + 1, dtype=int)        
-        snrs = inputs[0::2]  # Prend les indices 0, 2, 4, 6
+        snrs = inputs[0::2].copy()  # Prend les indices 0, 2, 4, 6
         qtes = inputs[1::2]  # Prend les indices 1, 3, 5, 7
         snrs[:2] /= 20
         snrs[2:] /= 14
