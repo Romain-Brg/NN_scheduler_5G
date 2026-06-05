@@ -18,8 +18,10 @@ meanTauxSucc = []
 stockageVitesses = []
 qteMAx = 2000
 net = Network(nbUsers=4,learning_rate=0.00125)
-net.load_NN("NN_1Layer_4_4U_real_V3_elague_trained.npz")
+net.load_NN("NN_1Layer_4_4U_real_V3_elague_re-trained.npz")
 nbUsers = net.nbUsers
+
+elagage = True
 
 #Boucle pour tester différentes valeurs de mon LR
 #for vitesse in np.linspace(vitesseInit, 0.06, 6):
@@ -63,6 +65,9 @@ erreurTic = []
 
 nbErreur = 0
 for step in range(stepMax):
+    if(elagage):
+        net.elagage()
+
 
     # 1. Générer des SNR aléatoires (ex: entre 0 et 20)
     snrs_reels = np.random.uniform(0, 20, size=nbUsers)
@@ -140,6 +145,7 @@ for step in range(stepMax):
 
     
     
+    
 
 
 
@@ -150,7 +156,7 @@ print(f"Taux de succès moyen suite à {step +1} tics : {np.mean(regroupementTau
       f"\n avec comme ecart-type {np.nanstd(regroupementTauxSucc)} et avec {nbErreur} erreurs faites ")
 
 
-net.save_NN("NN_1Layer_4_4U_real_V3_elague_trained.npz")
+net.save_NN("NN_1Layer_4_4U_real_V3_elague_re-trained.npz")
 
 
 

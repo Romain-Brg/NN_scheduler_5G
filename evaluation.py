@@ -15,11 +15,11 @@ from network_PF import Network_PF
 # Initialisation
 
 vitesseInit = 0.01
-stepMax = 2000
+stepMax = 4000
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
-net = Network(nbUsers=4,learning_rate=0.01)
+net = Network(nbUsers=4,learning_rate=0.005)
 net.load_NN("NN_1Layer_4_4U_real_V3_elague.npz")
 # net.elagage()
 # net.save_NN("NN_1Layer_4_4U_real_V3_elague.npz")
@@ -117,17 +117,17 @@ for step in range(stepMax):
 
         classementInputs = net.get_Tab_erreur(inputs, nbUsers)
         erreurTic.append(classementInputs[choix_reseau])
-        #Stockage de l'erreur
-        erreur = {
-            "step": int(step),
-            "choix_reseau": int(choix_reseau),
-            "choix_oracle": int(choix_oracle),
-            "gravite_erreur": int(classementInputs[choix_reseau]),
-            "snrs": snrs_reels.tolist(),
-            "quantites": quantites_reelles.tolist(),
-            "valeurs_neurones_sortie": prediction.flatten().tolist()
-        }
-        erreurs.append(erreur)
+        # #Stockage de l'erreur
+        # erreur = {
+        #     "step": int(step),
+        #     "choix_reseau": int(choix_reseau),
+        #     "choix_oracle": int(choix_oracle),
+        #     "gravite_erreur": int(classementInputs[choix_reseau]),
+        #     "snrs": snrs_reels.tolist(),
+        #     "quantites": quantites_reelles.tolist(),
+        #     "valeurs_neurones_sortie": prediction.flatten().tolist()
+        # }
+        # erreurs.append(erreur)
         #print(f"{prediction}")
 
     success_history.append(is_success)
@@ -172,7 +172,8 @@ for step in range(stepMax):
         #qteBits_tab_demandes.append(qteBits_demandes)
         qteBits_demandes += np.sum(quantites_reelles)
         regroupementTauxSucc.append(np.mean(success_history)*100)
-    success_history = []
+        success_history = []
+    
 
     qteBits_tab_demandes.append(qteBits_demandes)
 
@@ -184,16 +185,16 @@ for step in range(stepMax):
     tauxBits_transmis_NN = []
     
     # Sauvegarde des erreurs
-    if erreurs:
-        if os.path.exists(fichier_erreurs):
-            with open(fichier_erreurs, "r") as f:
-                existant = json.load(f)
-        else:
-            existant = []
-        existant.extend(erreurs)
-        with open(fichier_erreurs, "w") as f:
-            json.dump(existant, f, indent=4)
-        erreurs = []  # reset
+    # if erreurs:
+    #     if os.path.exists(fichier_erreurs):
+    #         with open(fichier_erreurs, "r") as f:
+    #             existant = json.load(f)
+    #     else:
+    #         existant = []
+    #     existant.extend(erreurs)
+    #     with open(fichier_erreurs, "w") as f:
+    #         json.dump(existant, f, indent=4)
+    #     erreurs = []  # reset
 
     
     
@@ -251,11 +252,14 @@ ax3.set_title("Nb fois elu succès par le NN / nb fois de l'oracle")
 ax3.set_xlabel("Neurone")
 ax3.set_ylabel("Taux")
 ax3.grid(True, axis="y")
+print(f"{taux_N_eluErreur + taux_N_eluSucces}")
+
+
 
 """graphe sur les erreurs"""
 fig3, ax4 = plt.subplots(figsize=(12, 5))
 
-ax4.plot(gravites_Erreurs, color="purple", marker="o", 
+ax4.plot(gravites_Erreurs, linestyle='none',color="purple", marker="o", 
         markersize=2, label="Erreurs", alpha=0.5)
 
 ax4.set_title(f"Evolution du degré de gravité des erreurs au cours des tics")
@@ -268,7 +272,7 @@ ax4.set_ylabel("Gravité")
 fig4, ax5 = plt.subplots(figsize=(12, 5))
 
 
-ax5.plot(tauxbits_transmis, color="blue", marker="o", 
+ax5.plot(tauxbits_transmis, color="blue", marker="o",linestyle='none', 
         markersize=2, label="bits_transmis", alpha=0.5)
 
 ax5.set_title(f"Evolution des bits transmis cours des tics tt les 100 tics")
