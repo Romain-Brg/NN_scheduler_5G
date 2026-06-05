@@ -2,7 +2,10 @@ Projet visant à faire un réseau de neurone pour imiter un scheduler d'antenne 
 
 Plusieurs configurations sont testées notamment en changeant le nombre de couches intermédiaires ainsi que leur tailles(nb neurnones par couche)
 
+V2 =  corresponnd à l'ajout de qtes pendant l'entrainement
 
+V3 = correspond à la V2 mais avec une meilleure normalisation qui permet d'améliorer la convergence explication : Pendant les 99 premiers tics, le réseau reçoit des quantités normalisées de manière absolue (divisées par 700 la qte max attribuable à un user). Mais à partir du tic 100, la variable sommeQte devient la somme réelle des files d'attente (qui peut valoir 1500 ou 2000). Le réseau reçoit des données normalisées de manière relative.
+Le réseau doit gérer deux types de signaux totalement différents pour la même entrée. Cela nuit gravement à sa convergence. donc on change en améliorant la normalisation
 
 
 

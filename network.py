@@ -29,7 +29,7 @@ class Network:
         
         # Dimensions
         self.input_size = nbUsers * 2
-        self.hidden_size = nbUsers * 2
+        self.hidden_size = nbUsers * 4
         self.output_size = nbUsers + 1
         
         # Initialisation des poids (Matrices) et biais (Vecteurs)
@@ -167,3 +167,10 @@ class Network:
         self.b2 = data['b2']
 
         print("poids chargés")
+
+
+    def elagage(self):
+        self.W1[(-1 <= self.W1 ) & (self.W1 <= 1)] = 0.0
+        self.W2[(-1 <= self.W2 ) & (self.W2 <= 1)] = 0.0
+
+    

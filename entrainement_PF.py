@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-from network_PF import Network
+from network_PF import Network_PF
 
 
 
@@ -16,8 +16,8 @@ regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 qteMAx = 2000
-net = Network(nbUsers=4,learning_rate=0.00015)
-net.load_NN("NN_PF_1Layer_3_4U_real_V2.npz")
+net = Network_PF(nbUsers=4,learning_rate=0.00015)
+net.load_NN("NN_PF_1Layer_4_4U_real_V2.npz")
 nbUsers = net.nbUsers
 
 #Boucle pour tester différentes valeurs de mon LR
@@ -136,7 +136,7 @@ for step in range(stepMax):
     if step % 100 == 99:
         #ajout de qte (+ réaliste)
         quantites_reelles += np.random.randint(0, 300, size=nbUsers).astype(float)
-        sommeQte= np.sum(quantites_reelles)
+        sommeQte= 300
         gravites_Erreurs.append(np.mean(erreurTic))
         erreurTic =[]
 
@@ -157,7 +157,7 @@ print(f"Taux de succès moyen suite à {step +1} tics : {np.mean(regroupementTau
       f"\n avec comme ecart-type {np.nanstd(regroupementTauxSucc)} et avec {nbErreur} erreurs faites ")
 
 
-net.save_NN("NN_PF_1Layer_3_4U_real_V2.npz")
+net.save_NN("NN_PF_1Layer_4_4U_real_V2.npz")
 
 
 

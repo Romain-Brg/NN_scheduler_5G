@@ -6,6 +6,8 @@ import os
 
 from network import Network
 from network_v2 import Network_2
+from network_PF import Network_PF
+
 
 
 
@@ -18,7 +20,9 @@ regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 net = Network(nbUsers=4,learning_rate=0.01)
-net.load_NN("NN_1Layer_2_4U_real_V2.npz")
+net.load_NN("NN_1Layer_4_4U_real_V3_elague.npz")
+# net.elagage()
+# net.save_NN("NN_1Layer_4_4U_real_V3_elague.npz")
 nbUsers = net.nbUsers
 
 
@@ -36,7 +40,7 @@ gravites_Erreurs = []
 
 #stocckage erreurs
 
-fichier_erreurs = f"erreurs_{net.nbLayers}midLayer{net.hidden_size}_nbUser{net.nbUsers}_Affine.json"
+fichier_erreurs = f"erreurs_{net.nbLayers}midLayer{net.hidden_size}_nbUser{net.nbUsers}_V3.json"
 erreurs = []
 
 
@@ -55,8 +59,8 @@ qteBits_demandes = 0
 qteBits_Transmis = 0
 
 # État initial des quantités (ex: chaque user a entre 0 et 700 unités)
-quantites_reelles = np.random.randint(0, 700, size=nbUsers).astype(float)
-sommeQte= 700.0
+quantites_reelles = np.random.randint(0, 400, size=nbUsers).astype(float)
+sommeQte= 400.0
 qteBits_demandes += np.sum(quantites_reelles)
 qteBits_tab_demandes.append(qteBits_demandes)
 
@@ -135,14 +139,18 @@ for step in range(stepMax):
     if(choix_oracle < nbUsers):
         tauxBits_transmis_Oracle.append(snrs_reels[choix_oracle])
     else:
-        tauxBits_transmis_Oracle.append(0)
+        tauxBits_transmis_Oracle.append(1)
 
     if(choix_reseau < nbUsers and quantites_reelles[choix_reseau] > 0):
         tauxBits_transmis_NN.append(snrs_reels[choix_reseau])
-        qteBits_Transmis += snrs_reels[choix_reseau]
+        qteBits_Transmis += np.minimum(snrs_reels[choix_reseau], quantites_reelles[choix_reseau])
         qteBits_tab_Transmis.append(qteBits_Transmis)
     else:
-        tauxBits_transmis_NN.append(0)
+        if(choix_reseau == choix_oracle):
+            tauxBits_transmis_NN.append(1)
+        else:
+            tauxBits_transmis_NN.append(0) 
+        
         qteBits_Transmis += 0
         qteBits_tab_Transmis.append(qteBits_Transmis)
 
@@ -158,38 +166,34 @@ for step in range(stepMax):
 
     if step % 100 == 99:
         #ajout de qte (+ réaliste)
-        quantites_reelles += np.random.randint(0, 300, size=nbUsers).astype(float)
-        sommeQte= np.sum(quantites_reelles)
+        quantites_reelles += np.random.randint(0, 400, size=nbUsers).astype(float)
+        sommeQte= 400
         
         #qteBits_tab_demandes.append(qteBits_demandes)
         qteBits_demandes += np.sum(quantites_reelles)
+        regroupementTauxSucc.append(np.mean(success_history)*100)
+    success_history = []
 
     qteBits_tab_demandes.append(qteBits_demandes)
 
-    if step % 20 == 19:
-        gravites_Erreurs.append(np.mean(erreurTic))
-        erreurTic =[]
-        tauxbits_transmis.append((np.sum(tauxBits_transmis_NN)/ np.sum(tauxBits_transmis_Oracle))*100)
-        tauxBits_transmis_Oracle = []
-        tauxBits_transmis_NN = []
-
-
-        regroupementTauxSucc.append(np.mean(success_history)*100)
-        success_history = []
-        # Sauvegarde des erreurs
-        if erreurs:
-            if os.path.exists(fichier_erreurs):
-                with open(fichier_erreurs, "r") as f:
-                    existant = json.load(f)
-            else:
-                existant = []
-
-            existant.extend(erreurs)
-
-            with open(fichier_erreurs, "w") as f:
-                json.dump(existant, f, indent=4)
-
-            erreurs = []  # reset
+    
+    gravites_Erreurs.append(np.mean(erreurTic))
+    erreurTic =[]
+    tauxbits_transmis.append((np.sum(tauxBits_transmis_NN)/ np.sum(tauxBits_transmis_Oracle))*100)
+    tauxBits_transmis_Oracle = []
+    tauxBits_transmis_NN = []
+    
+    # Sauvegarde des erreurs
+    if erreurs:
+        if os.path.exists(fichier_erreurs):
+            with open(fichier_erreurs, "r") as f:
+                existant = json.load(f)
+        else:
+            existant = []
+        existant.extend(erreurs)
+        with open(fichier_erreurs, "w") as f:
+            json.dump(existant, f, indent=4)
+        erreurs = []  # reset
 
     
     

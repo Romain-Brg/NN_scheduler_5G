@@ -21,7 +21,7 @@ def softmax(z):
     exp_z = np.exp(z - np.max(z))
     return exp_z / np.sum(exp_z, axis=0)
 
-class Network:
+class Network_PF:
     def __init__(self, nbUsers, learning_rate=0.1):
         self.nbUsers = nbUsers
         self.lr = learning_rate
@@ -29,7 +29,7 @@ class Network:
         
         # Dimensions
         self.input_size = nbUsers * 2
-        self.hidden_size = nbUsers * 3
+        self.hidden_size = nbUsers * 4
         self.output_size = nbUsers + 1
         
         # Initialisation des poids (Matrices) et biais (Vecteurs)
@@ -95,7 +95,7 @@ class Network:
     def get_oracle_target(self, inputs, nbUsers):
     # On sépare les SNR et les Quantités
         snrs = inputs[0::2].copy()  # Prend les indices 0, 2, 4, 6
-        qtes = inputs[1::2]  # Prend les indices 1, 3, 5, 7
+        qtes = inputs[1::2].copy()  # Prend les indices 1, 3, 5, 7
 
         target = np.zeros(nbUsers + 1) # [0, 0, 0, 0, 0]
 
@@ -108,8 +108,8 @@ class Network:
             # CAS : On cherche le max SNR parmi ceux qui ont de la data
             best_user = users_avec_data[0]
             
-            snrs[:2] /= 20
-            snrs[2:] /= 14
+            snrs[:2] /= 10                                                                                                                        
+            snrs[2:] /= 7
             
 
             max_snr = snrs[best_user]
@@ -126,9 +126,9 @@ class Network:
     def get_Tab_erreur(self, inputs, nbUsers):
         resultat = np.empty(nbUsers + 1, dtype=int)        
         snrs = inputs[0::2].copy()  # Prend les indices 0, 2, 4, 6
-        qtes = inputs[1::2]  # Prend les indices 1, 3, 5, 7
-        snrs[:2] /= 20
-        snrs[2:] /= 14
+        qtes = inputs[1::2].copy()  # Prend les indices 1, 3, 5, 7
+        snrs[:2] /= 10
+        snrs[2:] /= 7
         #print(f"les SNRS : {snrs} \n les qtes : {qtes}")
 
         if np.allclose(qtes, 0):
