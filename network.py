@@ -25,6 +25,7 @@ class Network:
     def __init__(self, nbUsers, learning_rate=0.1):
         self.nbUsers = nbUsers
         self.lr = learning_rate
+        self.nbLayers = 1
         
         # Dimensions
         self.input_size = nbUsers * 2
@@ -117,3 +118,59 @@ class Network:
             target[best_user] = 1.0
 
         return target
+    
+    def get_Tab_erreur(self, inputs, nbUsers):
+        resultat = np.empty(nbUsers + 1, dtype=int)        
+        snrs = inputs[0::2]  # Prend les indices 0, 2, 4, 6
+        qtes = inputs[1::2]  # Prend les indices 1, 3, 5, 7
+
+        #print(f"les SNRS : {snrs} \n les qtes : {qtes}")
+
+        if np.allclose(qtes, 0):
+        # Classement par ordre de snrs (max → 0)
+            ordre = np.argsort(snrs)[::-1]
+            rangs = np.empty(nbUsers, dtype=int)
+            rangs[ordre] = np.arange(nbUsers)
+            resultat[:nbUsers] = rangs
+            resultat[-1] = 0  # dernière case = 0
+
+   
+        else:
+            avec_qtes = np.where(qtes > 0)[0]   # indices des users avec qtes
+            sans_qtes = np.where(qtes == 0)[0]  # indices des users sans qtes
+
+            # Classement des users avec qtes par ordre de snrs
+            ordre_avec = avec_qtes[np.argsort(snrs[avec_qtes])[::-1]]
+
+            # Classement des users sans qtes par ordre de snrs
+            ordre_sans = sans_qtes[np.argsort(snrs[sans_qtes])[::-1]]
+
+            # Ordre final : avec qtes → sans qtes
+            ordre_final = np.concatenate([ordre_avec, ordre_sans])
+
+            rangs = np.empty(nbUsers, dtype=int)
+            rangs[ordre_final] = np.arange(nbUsers)
+            resultat[:nbUsers] = rangs
+            resultat[-1] = nbUsers  # dernière case = nbUsers
+
+        return resultat
+    
+    def save_NN(self, filepath="poids.npz"):
+        np.savez(filepath, W1=self.W1, b1=self.b1, W2=self.W2, b2=self.b2)
+        print(f"Poids sauvegardé dans {filepath}")
+
+    def load_NN(self, filepath="poids.npz"):
+        data = np.load(filepath)
+        self.W1 = data['W1']
+        self.b1 = data['b1']
+        self.W2 = data['W2']
+        self.b2 = data['b2']
+
+        print("poids chargés")
+
+
+    def elagage(self):
+        self.W1[(-1 <= self.W1 ) & (self.W1 <= 1)] = 0.0
+        self.W2[(-1 <= self.W2 ) & (self.W2 <= 1)] = 0.0
+
+    

@@ -1,2 +1,10 @@
 .venv
+*.pdf
+*.npz
+resultatPresentation.zip
+convertisseurJSONtoCSV.py
+visualiseur_NN.py
+*.csv 
+temp.txt
+
 __pycache__
