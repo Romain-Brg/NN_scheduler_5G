@@ -16,8 +16,8 @@ regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 qteMAx = 2000
-net = Network_PF(nbUsers=4,learning_rate=0.00015)
-net.load_NN("NN_PF_1Layer_4_4U_real_V2.npz")
+net = Network_PF(nbUsers=4,learning_rate=0.000125)
+net.load_NN("NN_PF_1Layer_4_4U_real_V3.npz")
 nbUsers = net.nbUsers
 
 #Boucle pour tester différentes valeurs de mon LR
@@ -43,8 +43,8 @@ gravites_Erreurs = []
 
 
 # État initial des quantités (ex: chaque user a entre 0 et 700 unités)
-quantites_reelles = np.random.randint(0, 700, size=nbUsers).astype(float)
-sommeQte= 700.0
+quantites_reelles = np.random.randint(0, 400, size=nbUsers).astype(float)
+sommeQte= 400
 
 # quantites_reelles = []
 # for i in range(nbUsers):
@@ -135,8 +135,8 @@ for step in range(stepMax):
 
     if step % 100 == 99:
         #ajout de qte (+ réaliste)
-        quantites_reelles += np.random.randint(0, 300, size=nbUsers).astype(float)
-        sommeQte= 300
+        quantites_reelles += np.random.randint(0, 400, size=nbUsers).astype(float)
+        sommeQte= 400
         gravites_Erreurs.append(np.mean(erreurTic))
         erreurTic =[]
 
@@ -157,7 +157,7 @@ print(f"Taux de succès moyen suite à {step +1} tics : {np.mean(regroupementTau
       f"\n avec comme ecart-type {np.nanstd(regroupementTauxSucc)} et avec {nbErreur} erreurs faites ")
 
 
-net.save_NN("NN_PF_1Layer_4_4U_real_V2.npz")
+net.save_NN("NN_PF_1Layer_4_4U_real_V3.npz")
 
 
 

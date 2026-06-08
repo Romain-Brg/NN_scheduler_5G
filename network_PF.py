@@ -100,7 +100,7 @@ class Network_PF:
         target = np.zeros(nbUsers + 1) # [0, 0, 0, 0, 0]
 
         # Trouver les utilisateurs qui ont encore des données
-        users_avec_data = [i for i, q in enumerate(qtes) if q > 0]
+        users_avec_data = [i for i, q in enumerate(qtes) if q > 0.0]
         if not users_avec_data:
             # CAS : Personne n'a de données -> Neurone de repos (le dernier)
             target[-1] = 1.0
