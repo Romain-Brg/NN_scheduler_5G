@@ -9,9 +9,9 @@ net = Network(nbUsers=4,learning_rate=0.01)
 net.load_NN("NN_1Layer_4_4U_real_V3.npz")
 nbUsers = net.nbUsers
 
-#print(f" etat intitial du NN : \n W1 :\n {net.W1} \n b1 : \n  {net.b1} \n W2 : \n  {net.W2} \n b2: \n {net.b2}")
+print(f" etat intitial du NN : \n W1 :\n {net.W1} \n b1 : \n  {net.b1} \n W2 : \n  {net.W2} \n b2: \n {net.b2}")
 
-quantites_reelles = np.array([0,0,0,0]).astype(float)
+quantites_reelles = np.array([15,0,0,0]).astype(float)
 snrs_reels = np.random.uniform(0, 20, size=nbUsers)
 
 snrs_norm = snrs_reels / 20.0
@@ -22,7 +22,7 @@ inputs[0::2] = snrs_norm
 inputs[1::2] = qtes_norm
     
 
-
+print(f"mkn : \n{snrs_reels} \n qtes :\n {quantites_reelles}")
 target = net.get_oracle_target(inputs,nbUsers=4)
 print(f"inputs :\n {inputs}")
 print(f"choix_oracle : {np.argmax(target)}")
