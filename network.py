@@ -36,7 +36,7 @@ class Network:
         # On utilise une petite variance pour aider la convergence
         self.W1 = np.random.randn(self.hidden_size, self.input_size) * 0.1
         self.b1 = np.zeros((self.hidden_size, 1))
-        
+    
         self.W2 = np.random.randn(self.output_size, self.hidden_size) * 0.1
         self.b2 = np.zeros((self.output_size, 1))
 
@@ -54,15 +54,14 @@ class Network:
 
     def backward(self, x, y_true):
         """
-        C'est ici que la magie de la Backpropagation opère.
-        y_true est le vecteur donné par ton Oracle (ex: [0, 1, 0, 0])
+        x = les inputs
+        y_true = oracle
         """
         m = 1 # On traite un exemple à la fois (Stochastic Gradient Descent)
 
         # 1. Erreur sur la couche de sortie (Delta 2)
         # Dérivée de la fonction de coût (MSE) : (a2 - y_true)
-        #d_a2 = self.a2 - y_true
-        #delta2 = d_a2 * sigmoid_Prime(self.z2)
+        """le cout C"""
         delta2 = self.a2 - y_true
 
         # 2. Erreur sur la couche cachée (Delta 1)
