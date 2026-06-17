@@ -12,16 +12,17 @@ from network_v2 import Network_2
 # Initialisation
 
 vitesseInit = 0.01
-stepMax = 1000000
+stepMax = 2000000
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 qteMAx = 2000
-net = Network(nbUsers=4,learning_rate=0.01)
-#net.load_NN("NN_1Layer_4_4U_real_V3_elague_re-trained.npz")
+net = Network(nbUsers=4,learning_rate=0.00015)
+#net.save_NN("NN_1midLayer_4_4u_untrained_V5.npz")
+net.load_NN("NN_1Layer_4_4U_real_v5.npz")
 nbUsers = net.nbUsers
 
-elagage = True
+elagage = False
 
 #Boucle pour tester différentes valeurs de mon LR
 #for vitesse in np.linspace(vitesseInit, 0.06, 6):
@@ -156,7 +157,7 @@ print(f"Taux de succès moyen suite à {step +1} tics : {np.mean(regroupementTau
       f"\n avec comme ecart-type {np.nanstd(regroupementTauxSucc)} et avec {nbErreur} erreurs faites ")
 
 
-net.save_NN("NN_1Layer_4_4U_real_v4.npz")
+net.save_NN("NN_1Layer_4_4U_real_v5.npz")
 
 
 

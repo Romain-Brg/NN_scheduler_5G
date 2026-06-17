@@ -19,8 +19,8 @@ stepMax = 10000
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
-net = Network(nbUsers=4,learning_rate=0.005)
-net.load_NN("NN_1Layer_4_4U_real_V3.npz")
+net = Network(nbUsers=4,learning_rate=0.01)
+#net.load_NN("NN_1Layer_4_4U_real_v4.npz")
 # net.elagage()
 # net.save_NN("NN_1Layer_4_4U_real_V3_elague.npz")
 
@@ -227,7 +227,7 @@ for step in range(stepMax):
 
     
     
-
+net.save_NN("NN_1Layer_4_4u_real_UNtrained.npz")
 
 
 
@@ -304,7 +304,7 @@ fig4, ax5 = plt.subplots(figsize=(12, 5))
 ax5.plot(tauxbits_transmis, color="blue", marker="o",linestyle='none', 
         markersize=2, label="bits_transmis", alpha=0.5)
 
-ax5.set_title(f"Evolution des bits transmis cours des tics tt les 100 tics")
+ax5.set_title(f"Evolution des bits transmis cours des tics")
 ax5.set_xlabel("Tics")
 ax5.set_ylabel("taux de transmissions")
 

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Réseau de neurones — 8 × 16 × 5</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #ffffff;
+    --bg2:       #f5f4f0;
+    --text:      #1a1a1a;
+    --text2:     #555;
+    --border:    rgba(0,0,0,0.12);
+    --border2:   rgba(0,0,0,0.22);
+    --pos:       #185FA5;
+    --neg:       #BA7517;
+    --radius:    8px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:      #1a1a1a;
+      --bg2:     #252525;
+      --text:    #e8e6de;
+      --text2:   #999;
+      --border:  rgba(255,255,255,0.1);
+      --border2: rgba(255,255,255,0.22);
+      --pos:     #85B7EB;
+      --neg:     #F9CB42;
+    }
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 24px 20px 40px;
+    min-height: 100vh;
+  }
+
+  header {
+    margin-bottom: 20px;
+  }
+  header h1 {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  header p {
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  #controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+  #controls label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #controls input[type=range] {
+    width: 130px;
+    accent-color: var(--pos);
+  }
+
+  #canvas-wrap {
+    width: 100%;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 0.5px solid var(--border);
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    cursor: default;
+  }
+
+  #legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text2);
+  }
+  #legend span { display: flex; align-items: center; gap: 5px; }
+  .l-line { width: 22px; height: 3px; border-radius: 2px; }
+  .l-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  #tooltip {
+    position: fixed;
+    pointer-events: none;
+    opacity: 0;
+    background: var(--bg);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text);
+    transition: opacity 0.1s;
+    z-index: 999;
+    max-width: 220px;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Réseau de neurones — 8 × 16 × 5</h1>
+  <p>NN_1midLayer_4_4u_untrained_V5.npz &nbsp;·&nbsp; 1 couche cachée &nbsp;·&nbsp; 8 entrées, 16 neurones cachés, 5 sorties</p>
+</header>
+
+<div id="controls">
+  <label>
+    Seuil de visibilité
+    <input type="range" id="threshold" min="0" max="95" value="0" step="1">
+    <span id="threshold-val">0 %</span>
+  </label>
+  <label><input type="checkbox" id="show-bias" checked> Biais</label>
+  <label><input type="checkbox" id="show-labels" checked> Labels</label>
+</div>
+
+<div id="canvas-wrap">
+  <canvas id="nn-canvas"></canvas>
+</div>
+
+<div id="legend">
+  <span><span class="l-line" style="background:var(--pos)"></span> Poids positif</span>
+  <span><span class="l-line" style="background:var(--neg)"></span> Poids négatif</span>
+  <span><span class="l-dot" style="background:var(--pos)"></span> Biais &gt; 0</span>
+  <span><span class="l-dot" style="background:var(--neg)"></span> Biais &lt; 0</span>
+  <span><span class="l-dot" style="background:var(--text2);opacity:.5"></span> Biais ≈ 0</span>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+const NN = {"n_layers": 1, "sizes": [8, 16, 5], "weights": [[[0.13555892848155127, 0.05324234728479924, 0.09163133541851046, -0.12181715496894707, -0.12826979631767083, 0.09267140570852461, 0.12803540357516122, 0.08486071720228959], [0.09778626685785616, -0.006859604819569163, -0.07306166914632045, -0.08380889216473905, 0.0010423849099539066, -0.04831597376084645, 0.08249966953000135, 0.030447227576211374], [0.009389051097194264, -0.06026315699186738, -0.09908942512120472, -0.12187691009893467, -0.12975695105132853, -0.01473813927586018, -0.11733131004768625, 0.05039672290616303], [0.02117234573047061, -0.08473175859296149, -0.02062927348789531, 0.014897727674093465, -0.09194903965006093, 0.18303188786350577, -0.15943340063580302, -0.0034503714738893334], [-0.08047811157660939, -0.1869176420896669, 0.27773692756669044, 0.15794737974705272, 0.005770745111777705, 0.04362236326950281, -0.0779132414611124, -0.1342464616188259], [0.006377604786841927, 0.03473238737387049, 0.1588205605353119, 0.08152516433327518, -0.15467128691200083, -0.0854384093218951, 0.1711945262230574, -0.04346805911688284], [-0.07681876490454341, -0.00040162163263022453, 0.0006675916180741343, -0.02394600804635732, -0.029734111411831084, -0.0009977267363966312, 0.08560658384985907, 0.02052696180232766], [-0.1102758715408327, 0.09730689233123144, 0.12272607611094555, -0.1544441660520505, 0.054552879710903925, -0.06223815699370842, -0.14163756701924285, 0.019339793690837003], [0.11291604756490992, -0.11252616550917437, 0.03121292116840717, 0.04203806213507879, -0.002741816526167181, -0.12741966904152544, -0.03695878338298449, -0.0526161999722449], [0.021022785398055275, -0.08630619238643683, 0.020765285262396637, -0.05199627289965497, 0.01847288700558018, 0.061045877247288605, 0.11727847057805935, -0.01810227708843092], [0.07237520304023473, -0.013286771532626704, 0.020374603794534013, -0.09883753022493105, -0.06756683751683867, -0.09094793509580518, 0.041790027772169634, 0.1542051787906046], [-0.05037494013031446, 0.018817195450750127, 0.01998355064994683, -0.05140518704284244, 0.0021309376313828014, -0.05556971456972626, -0.0776395942335973, 0.1067292890639235], [-0.016649740763565287, -0.04344167147034763, 0.05875657799918421, 0.18750714454949327, 0.11893043103418227, -0.033046790143451486, 0.02694482010777533, 0.04365144941037347], [-0.09231144844850185, 0.17529290694299812, 0.1442469197491099, -0.13373686303425456, 0.11912062153648054, -0.21701130199962476, -0.09807628868823558, 0.016638861614117147], [0.06965392189791338, 0.028683344373971128, -0.07979641238127244, -0.03884685885136982, 0.04119279632197654, -0.05312645381401707, -0.0737608332921299, 0.03062733088001652], [0.18998381090103617, -0.008171226152345796, 0.03313477561809654, 0.10462380166882719, -0.08242258221153069, -0.0449111292778058, 0.0527877601438857, 0.10152946945620966]], [[-0.12414783763783122, -0.027249185117338117, -0.004016836938403723, 0.09349102356176284, 0.009774741406154306, 0.08375005585230932, -0.23465732861440458, 0.17267742510303608, 0.1205004052784231, 0.02126199726700273, 0.08753187070581288, 0.06625011802170969, -0.052233100204563156, 0.19327938569022368, 0.06427339546687667, -0.11576240997380144], [0.010687337719503153, 0.020992994893326945, 0.06905080354319622, 0.0344400934170165, 0.1371144986479674, 0.1354839368274282, 0.07305195580965966, -0.19184450398535502, -0.07405274807356252, -0.032436374688485724, 0.04283755971855885, -0.04536711783549449, 0.07382149291936577, 0.14074639033557285, 0.09168405922385077, -0.028463399439042303], [0.06940356930394075, 0.1559493814771683, 0.128549998865393, 0.16554143682427913, -0.04076482270796814, -0.025074520793201445, -0.040808993252667396, 0.10503432597954572, 0.23167239056674035, 0.0029038810092954365, 0.10588011593359954, -0.014386617049711038, 0.19726387414139324, 0.1942625969041748, 0.090411248991467, 0.10847696845256556], [0.19490917849404185, 0.1981815184228868, -0.030723023649085326, -0.028131089613124036, -0.04735489892815458, -0.0652525724715338, 0.06321052559186056, 0.27688196987086183, -0.005853758654057165, 0.0686625521814279, -0.0589929227152115, 0.1173147289801973, 0.13766085724439944, 0.16317774430847537, 0.008692365261693836, -0.03593998173058926], [0.18822070230714982, -0.19470599437815944, -0.048006554953322345, -0.12459995367522013, 0.04198675247354315, 0.01588992560374775, -0.05327353471328396, 0.21996479053252882, -0.03232682252351817, 0.0036552819605086585, 2.400184011397543e-05, -0.22899336854146546, -0.2698025784120399, -0.08246900843352706, 0.12163622099615519, -0.07955742795884642]]], "biases": [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0]]};
+
+const canvas  = document.getElementById('nn-canvas');
+const ctx     = canvas.getContext('2d');
+const tooltip = document.getElementById('tooltip');
+
+const SIZES   = NN.sizes;        // [n_in, ...hidden..., n_out]
+const N_LAYER = SIZES.length;    // nombre total de couches (entrée incluse)
+const MAX_STR = 5;               // épaisseur max d'un trait en px
+
+let hoveredNode = null;
+let hoveredEdge = null;
+let threshold   = 0;
+let showBias    = true;
+let showLabels  = true;
+let edgeList    = [];
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function isDark() {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function hexToRgb(hex) {
+  hex = hex.replace('#','');
+  if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
+  return [parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16)];
+}
+
+function distToSegment(px, py, x1, y1, x2, y2) {
+  const dx = x2-x1, dy = y2-y1, len2 = dx*dx+dy*dy;
+  if (len2===0) return Math.hypot(px-x1, py-y1);
+  const t = Math.max(0, Math.min(1, ((px-x1)*dx+(py-y1)*dy)/len2));
+  return Math.hypot(px-(x1+t*dx), py-(y1+t*dy));
+}
+
+// ── Layout ───────────────────────────────────────────────────────────────────
+
+function getDims() {
+  const maxN = Math.max(...SIZES);
+  const w    = canvas.clientWidth || 900;
+  const h    = Math.max(480, maxN * 28 + 100);
+  return { w, h };
+}
+
+function setup() {
+  const dpr = window.devicePixelRatio || 1;
+  const { w, h } = getDims();
+  canvas.style.width  = w + 'px';
+  canvas.style.height = h + 'px';
+  canvas.width  = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+  return { w, h };
+}
+
+function getPositions(w, h) {
+  const margin = 0.08;
+  return SIZES.map((n, li) => {
+    const xFrac = N_LAYER === 1 ? 0.5 : margin + (li / (N_LAYER-1)) * (1 - 2*margin);
+    const x     = w * xFrac;
+    const spacing = h / (n + 1);
+    return Array.from({length: n}, (_, i) => ({ x, y: spacing*(i+1) }));
+  });
+}
+
+// ── Max absolute weight per layer transition ──────────────────────────────────
+
+function getMaxWeights() {
+  return NN.weights.map(W =>
+    Math.max(...W.map(row => Math.max(...row.map(Math.abs))))
+  );
+}
+
+// ── Edge list ─────────────────────────────────────────────────────────────────
+
+function buildEdges(pos, maxW, thresholds) {
+  const edges = [];
+  NN.weights.forEach((W, wi) => {
+    const fromLayer = pos[wi];
+    const toLayer   = pos[wi+1];
+    const nFrom = fromLayer.length, nTo = toLayer.length;
+    const thresh = thresholds[wi];
+    for (let j = 0; j < nTo; j++) {
+      for (let i = 0; i < nFrom; i++) {
+        const w = W[j][i];
+        if (Math.abs(w) < thresh) continue;
+        edges.push({
+          x1: fromLayer[i].x, y1: fromLayer[i].y,
+          x2: toLayer[j].x,   y2: toLayer[j].y,
+          w, maxW: maxW[wi],
+          fromLayer: wi, fromIdx: i,
+          toLayer: wi+1, toIdx: j,
+          label: `${layerName(wi, i)} → ${layerName(wi+1, j)}`
+        });
+      }
+    }
+  });
+  return edges;
+}
+
+function layerName(li, ni) {
+  if (li === 0)          return `x${ni+1}`;
+  if (li === N_LAYER-1)  return `y${ni+1}`;
+  return `h${li}.${ni+1}`;
+}
+
+// ── Draw ──────────────────────────────────────────────────────────────────────
+
+function draw() {
+  const { w, h } = setup();
+  const pos     = getPositions(w, h);
+  const maxW    = getMaxWeights();
+  const thresh  = maxW.map(m => (threshold/100)*m);
+  edgeList = buildEdges(pos, maxW, thresh);
+
+  ctx.clearRect(0, 0, w, h);
+
+  const dark   = isDark();
+  const posRGB = hexToRgb(dark ? '#85B7EB' : '#185FA5');
+  const negRGB = hexToRgb(dark ? '#F9CB42' : '#BA7517');
+
+  // Dessiner les arêtes
+  edgeList.forEach((e, idx) => {
+    const absW  = Math.abs(e.w);
+    const norm  = absW / e.maxW;
+    const [r,g,b] = e.w > 0 ? posRGB : negRGB;
+    const isHovEdge = hoveredEdge === idx;
+
+    let alpha, sw;
+    if (hoveredEdge !== null) {
+      alpha = isHovEdge ? Math.min(0.05 + norm*0.85, 1)*1.3 : (0.05+norm*0.85)*0.06;
+      sw    = isHovEdge ? (0.3+norm*MAX_STR)*1.8 : 0.3+norm*MAX_STR;
+    } else if (hoveredNode !== null) {
+      const { li, ni } = hoveredNode;
+      const conn = (li===e.fromLayer && ni===e.fromIdx) || (li===e.toLayer && ni===e.toIdx);
+      alpha = conn ? Math.min(0.05+norm*0.85,1)*1.2 : (0.05+norm*0.85)*0.07;
+      sw    = conn ? (0.3+norm*MAX_STR)*1.3 : 0.3+norm*MAX_STR;
+    } else {
+      alpha = 0.05 + norm*0.85;
+      sw    = 0.3  + norm*MAX_STR;
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(e.x1, e.y1);
+    ctx.lineTo(e.x2, e.y2);
+    ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
+    ctx.lineWidth   = sw;
+    ctx.stroke();
+  });
+
+  // Dessiner les neurones
+  pos.forEach((layer, li) => {
+    const R = Math.min(10, Math.max(4, (h/(layer.length+1))*0.27));
+    layer.forEach((node, ni) => {
+      const bias = li > 0 ? NN.biases[li-1][ni] : null;
+      const isHov = hoveredNode && hoveredNode.li===li && hoveredNode.ni===ni;
+      const fade  = (hoveredNode || hoveredEdge !== null) && !isHov;
+
+      // Couleur du noeud selon biais
+      let fill;
+      if (bias === null) {
+        fill = dark ? '#666' : '#bbb';
+      } else if (Math.abs(bias) < 0.1) {
+        fill = dark ? '#777' : '#aaa';
+      } else {
+        fill = bias > 0
+          ? (dark ? '#85B7EB' : '#185FA5')
+          : (dark ? '#F9CB42' : '#BA7517');
+      }
+
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, R+(isHov?3:0), 0, Math.PI*2);
+      ctx.fillStyle   = fill;
+      ctx.globalAlpha = fade ? 0.28 : 0.88;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = dark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.15)';
+      ctx.lineWidth   = isHov ? 2 : 0.5;
+      ctx.stroke();
+
+      // Biais textuel à l'intérieur si assez grand
+      if (showBias && bias !== null && R >= 8) {
+        ctx.font         = `${Math.max(8, R-1)}px system-ui,sans-serif`;
+        ctx.textAlign    = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle    = dark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.85)';
+        ctx.globalAlpha  = fade ? 0.22 : 0.75;
+        ctx.fillText(bias.toFixed(2), node.x, node.y);
+        ctx.globalAlpha  = 1;
+      }
+
+      // Label du neurone
+      if (showLabels) {
+        const label = layerName(li, ni);
+        const lx    = li === 0 ? node.x - R - 5 : node.x + R + 5;
+        ctx.font         = '11px system-ui,sans-serif';
+        ctx.textAlign    = li === 0 ? 'right' : 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle    = dark ? 'rgba(200,200,200,0.65)' : 'rgba(60,60,60,0.65)';
+        ctx.globalAlpha  = fade ? 0.18 : 0.8;
+        ctx.fillText(label, lx, node.y);
+        ctx.globalAlpha  = 1;
+      }
+    });
+  });
+
+  // Labels de couche en bas
+  const lnames = ['Entrées', ...Array.from({length:N_LAYER-2}, (_,i)=>`Cachée ${i+1}`), 'Sorties'];
+  const lsizes = SIZES;
+  ctx.font      = '11px system-ui,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = dark ? 'rgba(170,170,170,0.65)' : 'rgba(90,90,90,0.65)';
+  ctx.globalAlpha = 1;
+  const ly = h - 8;
+  pos.forEach((layer, li) => {
+    ctx.fillText(`${lnames[li]} (${lsizes[li]})`, layer[Math.floor(layer.length/2)].x, ly);
+  });
+}
+
+// ── Hit tests ─────────────────────────────────────────────────────────────────
+
+function hitNode(mx, my) {
+  const { w, h } = getDims();
+  const pos = getPositions(w, h);
+  const R = 14;
+  for (let li=0; li<pos.length; li++)
+    for (let ni=0; ni<pos[li].length; ni++) {
+      const n = pos[li][ni];
+      if ((mx-n.x)**2 + (my-n.y)**2 <= R*R) return { li, ni };
+    }
+  return null;
+}
+
+function hitEdge(mx, my) {
+  for (let i=edgeList.length-1; i>=0; i--) {
+    const e = edgeList[i];
+    const sw  = 0.3 + (Math.abs(e.w)/e.maxW)*MAX_STR;
+    const hit = Math.max(5, sw*0.5+2);
+    if (distToSegment(mx, my, e.x1, e.y1, e.x2, e.y2) <= hit) return i;
+  }
+  return null;
+}
+
+// ── Tooltip ───────────────────────────────────────────────────────────────────
+
+function showTip(ev, html) {
+  tooltip.innerHTML = html;
+  tooltip.style.opacity = '1';
+  tooltip.style.left = (ev.clientX+14)+'px';
+  tooltip.style.top  = (ev.clientY-10)+'px';
+}
+
+function hideTip() {
+  tooltip.style.opacity = '0';
+}
+
+canvas.addEventListener('mousemove', ev => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = ev.clientX - rect.left;
+  const my = ev.clientY - rect.top;
+  const nh = hitNode(mx, my);
+
+  if (nh) {
+    hoveredNode = nh; hoveredEdge = null;
+    canvas.style.cursor = 'pointer';
+    const { li, ni } = nh;
+    const name  = layerName(li, ni);
+    const lname = li===0 ? 'Entrée' : li===N_LAYER-1 ? 'Sortie' : `Cachée ${li}`;
+    let html = `<strong>${lname} — ${name}</strong><br>`;
+    if (li > 0) {
+      const b = NN.biases[li-1][ni];
+      html += `Biais : ${b > 0 ? '+' : ''}${b.toFixed(5)}<br>`;
+    }
+    // Top 3 poids entrants (sauf couche d'entrée)
+    if (li > 0) {
+      const W = NN.weights[li-1];
+      const top = W[ni].map((v,i) => ({v,i})).sort((a,b)=>Math.abs(b.v)-Math.abs(a.v)).slice(0,3);
+      html += `Top 3 entrants :<br>`;
+      top.forEach(({v,i}) => {
+        const c = v > 0 ? 'var(--pos)' : 'var(--neg)';
+        html += `&nbsp;${layerName(li-1,i)} : <span style="color:${c};font-weight:500">${v>0?'+':''}${v.toFixed(4)}</span><br>`;
+      });
+    }
+    // Top 3 poids sortants (sauf couche de sortie)
+    if (li < N_LAYER-1) {
+      const W = NN.weights[li];
+      const top = W.map((row,j) => ({v:row[ni],j})).sort((a,b)=>Math.abs(b.v)-Math.abs(a.v)).slice(0,3);
+      html += `Top 3 sortants :<br>`;
+      top.forEach(({v,j}) => {
+        const c = v > 0 ? 'var(--pos)' : 'var(--neg)';
+        html += `&nbsp;→ ${layerName(li+1,j)} : <span style="color:${c};font-weight:500">${v>0?'+':''}${v.toFixed(4)}</span><br>`;
+      });
+    }
+    showTip(ev, html);
+  } else {
+    const eh = hitEdge(mx, my);
+    if (eh !== null) {
+      hoveredEdge = eh; hoveredNode = null;
+      canvas.style.cursor = 'crosshair';
+      const e = edgeList[eh];
+      const c = e.w > 0 ? 'var(--pos)' : 'var(--neg)';
+      showTip(ev,
+        `<strong>${e.label}</strong><br>` +
+        `Poids : <span style="color:${c};font-weight:500">${e.w>0?'+':''}${e.w.toFixed(6)}</span>`
+      );
+    } else {
+      hoveredNode = null; hoveredEdge = null;
+      canvas.style.cursor = 'default';
+      hideTip();
+    }
+  }
+  draw();
+});
+
+canvas.addEventListener('mouseleave', () => {
+  hoveredNode = null; hoveredEdge = null;
+  hideTip(); draw();
+});
+
+// ── Contrôles ─────────────────────────────────────────────────────────────────
+
+document.getElementById('threshold').addEventListener('input', function() {
+  threshold = +this.value;
+  document.getElementById('threshold-val').textContent = threshold + ' %';
+  draw();
+});
+document.getElementById('show-bias').addEventListener('change',   function() { showBias   = this.checked; draw(); });
+document.getElementById('show-labels').addEventListener('change', function() { showLabels = this.checked; draw(); });
+
+window.addEventListener('resize', draw);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+
+draw();
+</script>
+</body>
+</html>

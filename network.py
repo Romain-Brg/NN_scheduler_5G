@@ -171,5 +171,84 @@ class Network:
     def elagage(self):
         self.W1[(-1 <= self.W1 ) & (self.W1 <= 1)] = 0.0
         self.W2[(-1 <= self.W2 ) & (self.W2 <= 1)] = 0.0
+    
+    def elagage_negatif(self):
+        self.W1[ (self.W1 <= 0)] = 0.0
+        self.W2[ (self.W2 <= 0)] = 0.0
+
+    def softMaxage_poids(self):
+
+        """Les poids"""
+        sumPositif = 0
+        sumNegatif = 0
+        #comptage
+        w1_positifs = self.W1 > 0
+        w1_negatifs = self.W1 < 0
+
+        sumPositif = np.sum(self.W1[w1_positifs])
+        sumNegatif = (-1) * np.sum(self.W1[w1_negatifs])
+
+        print(sumPositif)
+        print(sumNegatif)
+            
+        if sumPositif > 0:
+            self.W1[w1_positifs] /= sumPositif
+
+        if sumNegatif > 0:
+            self.W1[w1_negatifs] /= sumNegatif
+
+        sumPositif = 0
+        sumNegatif = 0
+        #comptage
+        w2_positifs = self.W2 > 0
+        w2_negatifs = self.W2 < 0
+
+        sumPositif = np.sum(self.W2[w2_positifs])
+        sumNegatif = (-1)* np.sum(self.W2[w2_negatifs])
+
+        print(sumPositif)
+        print(sumNegatif)
+            
+        if sumPositif > 0:
+            self.W2[w2_positifs] /= sumPositif
+
+        if sumNegatif > 0:
+            self.W2[w2_negatifs] /= sumNegatif
+
+
+
+
+        """Les biais"""
+
+        b1_positifs = self.b1 > 0
+        b1_negatifs = self.b1 < 0
+
+        sumPositif = np.sum(self.b1[b1_positifs])
+        sumNegatif = (-1) * np.sum(self.b1[b1_negatifs])
+
+        print(sumPositif)
+        print(sumNegatif)
+            
+        if sumPositif > 0:
+            self.b1[b1_positifs] /= sumPositif
+
+        if sumNegatif > 0:
+            self.b1[b1_negatifs] /= sumNegatif
+
+        b2_positifs = self.b2 > 0
+        b2_negatifs = self.b2 < 0
+
+        sumPositif = np.sum(self.b2[b2_positifs])
+        sumNegatif = (-1) * np.sum(self.b2[b2_negatifs])
+
+        print(sumPositif)
+        print(sumNegatif)
+            
+        if sumPositif > 0:
+            self.b2[b2_positifs] /= sumPositif
+
+        if sumNegatif > 0:
+            self.b2[b2_negatifs] /= sumNegatif
+
 
     
