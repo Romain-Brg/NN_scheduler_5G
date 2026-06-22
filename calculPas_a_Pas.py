@@ -1,12 +1,13 @@
 import numpy as np
 
 from network import Network
+from network_FaitMain import Network_Mano
 
 
 
 
-net = Network(nbUsers=4,learning_rate=0.01)
-net.load_NN("NN_1Layer_4_4U_real_v5.npz")
+net = Network_Mano(nbUsers=4,learning_rate=0.01)
+#net.load_NN("NN_1Layer_4_4U_real_v5.npz")
 nbUsers = net.nbUsers
 
 print(f" etat intitial du NN : \n W1 :\n {net.W1} \n b1 : \n  {net.b1} \n W2 : \n  {net.W2} \n b2: \n {net.b2}")
@@ -27,13 +28,13 @@ print(f" etat intitial du NN : \n W1 :\n {net.W1} \n b1 : \n  {net.b1} \n W2 : \
 # net.b1[2]=0
 
 
-net.W2[0,9] = 0
+# net.W2[0,9] = 0
 
-net.W2[1,7] = 0
+# net.W2[1,7] = 0
 
-net.W2[2,13] = 0
+# net.W2[2,13] = 0
 
-net.W2[3,14] = 0
+# net.W2[3,14] = 0
 # net.b1[7]=0
 
 print(f" etat modifie du NN : \n W1 :\n {net.W1} \n b1 : \n  {net.b1} \n W2 : \n  {net.W2} \n b2: \n {net.b2}")
@@ -68,4 +69,4 @@ print(f" activiation a1 des neurones du milieu (a1 = reLu(z1)) :\n {net.a1} \n \
 print(f"z2 = a1*W2 + b2: \n{net.z2}\n")
 print(f" activiation a1 des neurones de la dernière couche (a2 = reLu(z2)) :\n {net.a2}")
 
-net.save_NN("NN_1Layer_4_4U_real_v5_0_aux_grospoids.npz")
+net.save_NN("NN_1Layer_9_5_remplissageMain.npz")

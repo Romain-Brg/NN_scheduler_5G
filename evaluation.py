@@ -7,6 +7,7 @@ import os
 from network import Network
 from network_v2 import Network_2
 from network_PF import Network_PF
+from network_FaitMain import Network_Mano
 
 
 
@@ -19,8 +20,8 @@ stepMax = 10000
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
-net = Network(nbUsers=4,learning_rate=0.01)
-net.load_NN("NN_1Layer_4_4U_real_v5_0_aux_grospoids.npz")
+net = Network_Mano(nbUsers=4,learning_rate=0.01)
+net.load_NN("NN_1Layer_9_5_remplissageMain.npz")
 # net.elagage()
 # net.save_NN("NN_1Layer_4_4U_real_V3_elague.npz")
 
