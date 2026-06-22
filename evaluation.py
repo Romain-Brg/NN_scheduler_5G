@@ -20,7 +20,7 @@ regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 net = Network(nbUsers=4,learning_rate=0.01)
-#net.load_NN("NN_1Layer_4_4U_real_v4.npz")
+net.load_NN("NN_1Layer_4_4U_real_v5_0_aux_grospoids.npz")
 # net.elagage()
 # net.save_NN("NN_1Layer_4_4U_real_V3_elague.npz")
 
@@ -227,7 +227,6 @@ for step in range(stepMax):
 
     
     
-net.save_NN("NN_1Layer_4_4u_real_UNtrained.npz")
 
 
 

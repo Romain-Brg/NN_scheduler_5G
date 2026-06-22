@@ -16,10 +16,9 @@ stepMax = 2000000
 regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
-qteMAx = 2000
+#qteMAx = 2000
 net = Network(nbUsers=4,learning_rate=0.00015)
-#net.save_NN("NN_1midLayer_4_4u_untrained_V5.npz")
-net.load_NN("NN_1Layer_4_4U_real_v5.npz")
+#net.load_NN("NN_1Layer_4_4U_real_v5.npz")
 nbUsers = net.nbUsers
 
 elagage = False
