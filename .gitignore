@@ -1,5 +1,4 @@
 .venv
-*.pdf
 *.npz
 resultatPresentation.zip
 convertisseurJSONtoCSV.py
