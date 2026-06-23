@@ -37,6 +37,7 @@ pip install -r requirements.txt
 - V4 et V5 sont des versions similaires à la V3 mais à des fins de présentations
 <br>
 <br>
+
 ## Comment entraîner un réseau de neurones ?
 
 ### 1ère étape :
