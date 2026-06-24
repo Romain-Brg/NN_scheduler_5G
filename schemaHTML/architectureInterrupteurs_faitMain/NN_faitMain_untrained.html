@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Réseau de neurones — 2 × 2 × 2</title>
+<title>Réseau de neurones — 8 × 9 × 5</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -119,8 +119,8 @@
 <body>
 
 <header>
-  <h1>Réseau de neurones — 2 × 2 × 2</h1>
-  <p>NN-presentation.npz &nbsp;·&nbsp; 1 couche cachée &nbsp;·&nbsp; 2 entrées, 2 neurones cachés, 2 sorties</p>
+  <h1>Réseau de neurones — 8 × 9 × 5</h1>
+  <p>NN_1Layer_9_5_remplissageMain_Correct.npz &nbsp;·&nbsp; 1 couche cachée &nbsp;·&nbsp; 8 entrées, 9 neurones cachés, 5 sorties</p>
 </header>
 
 <div id="controls">
@@ -148,7 +148,7 @@
 <div id="tooltip"></div>
 
 <script>
-const NN = {"n_layers": 1, "sizes": [2, 2, 2], "weights": [[[0.5, 0.5], [0.5, 0.5]], [[0.5, 0.5], [0.5, 0.5]]], "biases": [[0.0, 0.0], [0.0, 0.0]]};
+const NN = {"n_layers": 1, "sizes": [8, 9, 5], "weights": [[[3.0, -0.0, 0.0, -0.0, 0.0, 0.0, 0.0, -0.0], [-0.0, -0.0, 3.0, -0.0, 0.0, -0.0, -0.0, 0.0], [-0.0, -0.0, 0.0, -0.0, 3.0, 0.0, -0.0, 0.0], [-0.0, -0.0, 0.0, -0.0, -0.0, 0.0, 3.0, -0.0], [-0.0, -30.0, -0.0, 0.0, 0.0, 0.0, 0.0, -0.0], [0.0, 0.0, -0.0, -30.0, 0.0, -0.0, 0.0, 0.0], [-0.0, -0.0, 0.0, 0.0, 0.0, -30.0, -0.0, -0.0], [0.0, 0.0, 0.0, -0.0, -0.0, 0.0, -0.0, -30.0], [0.0, -15.0, 0.0, -15.0, 0.0, -15.0, 0.0, -15.0]], [[3.0, -0.0, -0.0, -0.0, -13.0, 4.0, 4.0, 4.0, -5.0], [0.0, 3.0, 0.0, -0.0, 4.0, -13.0, 4.0, 4.0, -5.0], [-0.0, -0.0, 3.0, 0.0, 4.0, 4.0, -13.0, 4.0, -5.0], [0.0, -0.0, -0.0, 3.0, 4.0, 4.0, 4.0, -13.0, -5.0], [0.0, -0.0, -0.0, -0.0, -4.0, -4.0, -4.0, -4.0, 12.0]]], "biases": [[0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], [0.0, 0.0, 0.0, 0.0, 0.0]]};
 
 const canvas  = document.getElementById('nn-canvas');
 const ctx     = canvas.getContext('2d');

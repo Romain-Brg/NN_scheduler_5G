@@ -22,11 +22,11 @@ def softmax(z):
     return exp_z / np.sum(exp_z, axis=0)
 
 class Network_Mano:
-    def __init__(self, nbUsers, learning_rate=0.1):
+    def __init__(self, nbUsers, learning_rate=0.1, trainAll_neurals = True):
         self.nbUsers = nbUsers
         self.lr = learning_rate
         self.nbLayers = 1
-        
+        self.trainAll_nudges = trainAll_neurals
         # Dimensions
         self.input_size = nbUsers * 2
         self.hidden_size = nbUsers * 2 + 1
@@ -35,28 +35,28 @@ class Network_Mano:
         # Initialisation des poids (Matrices) et biais (Vecteurs)
         # On utilise une petite variance pour aider la convergence
         self.W1 = np.random.randn(self.hidden_size, self.input_size) * 0.0
-        self.b1 = np.zeros((self.hidden_size, 1))
+        self.b1 = np.full((self.hidden_size, 1), 0.5)
     
         
 
         #user 1
         self.W1[0,0] = 3 #mkn
-        self.W1[4,1] = 30 #buffer
+        self.W1[4,1] = -30 #buffer
         self.W1[8,1] = -15 
 
         #user 2
         self.W1[1,2] = 3 #mkn
-        self.W1[5,3] = 30 #buffer
+        self.W1[5,3] = -30 #buffer
         self.W1[8,3] = -15
 
         #user 3
         self.W1[2,4] = 3 #mkn
-        self.W1[6,5] = 30 #buffer
+        self.W1[6,5] = -30 #buffer
         self.W1[8,5] = -15
 
         #user 4
         self.W1[3,6] = 3 #mkn
-        self.W1[7,7] = 30 #buffer
+        self.W1[7,7] = -30 #buffer
         self.W1[8,7] = -15
 
         self.W2 = np.random.randn(self.output_size, self.hidden_size) * 0.0
@@ -65,41 +65,41 @@ class Network_Mano:
 
         #neurone final 1
         self.W2[0,0] = 3
-        self.W2[0,4] = 13
+        self.W2[0,4] = -13
 
-        self.W2[0,5] = -4
-        self.W2[0,6] = -4
-        self.W2[0,7] = -4
+        self.W2[0,5] = 4
+        self.W2[0,6] = 4
+        self.W2[0,7] = 4
 
         self.W2[0,8] = -5
 
         #neurone final 2
         self.W2[1,1] = 3
-        self.W2[1,5] = 13
+        self.W2[1,5] = -13
 
-        self.W2[1,4] = -4
-        self.W2[1,6] = -4
-        self.W2[1,7] = -4
+        self.W2[1,4] = 4
+        self.W2[1,6] = 4
+        self.W2[1,7] = 4
         
         self.W2[1,8] = -5
 
         #neurone final 3
         self.W2[2,2] = 3
-        self.W2[2,6] = 13
+        self.W2[2,6] = -13
         
-        self.W2[2,4] = -4
-        self.W2[2,5] = -4
-        self.W2[2,7] = -4
+        self.W2[2,4] = 4
+        self.W2[2,5] = 4
+        self.W2[2,7] = 4
 
         self.W2[2,8] = -5
 
         #neurone final 4
         self.W2[3,3] = 3
-        self.W2[3,7] = 13
+        self.W2[3,7] = -13
 
-        self.W2[3,4] = -4
-        self.W2[3,5] = -4
-        self.W2[3,6] = -4
+        self.W2[3,4] = 4
+        self.W2[3,5] = 4
+        self.W2[3,6] = 4
 
 
         self.W2[3,8] = -5
@@ -110,6 +110,49 @@ class Network_Mano:
         self.W2[4,6] = -4
         self.W2[4,7] = -4
         self.W2[4,8] = 12
+
+        print(f" etat intitial du NN : \n W1 :\n {self.W1} \n b1 : \n  {self.b1} \n W2 : \n  {self.W2} \n b2: \n {self.b2}")
+
+    def mise_a_zero_resteNeurones(self):
+        # Masque W1
+        mask1 = np.zeros_like(self.W1, dtype=bool)
+        # user 1
+        mask1[0,0] = True
+        mask1[4,1] = True
+        mask1[8,1] = True
+        # user 2
+        mask1[1,2] = True
+        mask1[5,3] = True
+        mask1[8,3] = True
+        # user 3
+        mask1[2,4] = True
+        mask1[6,5] = True
+        mask1[8,5] = True
+        # user 4
+        mask1[3,6] = True
+        mask1[7,7] = True
+        mask1[8,7] = True
+    
+        # Masque W2
+        mask2 = np.zeros_like(self.W2, dtype=bool)
+        # neurone final 1
+        mask2[0,0] = True; mask2[0,4] = True; mask2[0,5] = True
+        mask2[0,6] = True; mask2[0,7] = True; mask2[0,8] = True
+        # neurone final 2
+        mask2[1,1] = True; mask2[1,5] = True; mask2[1,4] = True
+        mask2[1,6] = True; mask2[1,7] = True; mask2[1,8] = True
+        # neurone final 3
+        mask2[2,2] = True; mask2[2,6] = True; mask2[2,4] = True
+        mask2[2,5] = True; mask2[2,7] = True; mask2[2,8] = True
+        # neurone final 4
+        mask2[3,3] = True; mask2[3,7] = True; mask2[3,4] = True
+        mask2[3,5] = True; mask2[3,6] = True; mask2[3,8] = True
+        # neurone final 5
+        mask2[4,4] = True; mask2[4,5] = True; mask2[4,6] = True
+        mask2[4,7] = True; mask2[4,8] = True
+    
+        self.W1 = np.where(mask1, self.W1, 0)
+        self.W2 = np.where(mask2, self.W2, 0)
 
 
     def updateLR(self, newLR):
@@ -152,6 +195,13 @@ class Network_Mano:
         self.b2 -= self.lr * db2
         self.W1 -= self.lr * dW1
         self.b1 -= self.lr * db1
+
+        if(not self.trainAll_nudges):
+            self.mise_a_zero_resteNeurones()
+
+    def print_NN(self):
+        print(f" etat du NN : \n W1 :\n {self.W1} \n b1 : \n  {self.b1} \n W2 : \n  {self.W2} \n b2: \n {self.b2}")
+
 
     def train_step(self, inputs, target):
         # On transforme l'entrée en vecteur colonne pour NumPy

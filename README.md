@@ -4,6 +4,15 @@ Un réseau de neurones codé exclusivement en Python à l'aide la bibliothèque 
 <br>
 <br>
 
+## Ce que contient ce dépôt
+
+- Les fichiers python contenant les constructeurs des différents réseaux, les entrainements et le visualiseur HTML
+- educational_materials contient supports explicatifs et un petit cours
+- erreursJSON contient les fichiers .json regroupant les erreurs pour leur analyse
+- schemaHTML contient tous les schema HTML rangés par thématiques
+- sauvegarde_de_tous_NN.zip est un fichier compressé contenant tous les NN entrainés et sauvegardés
+<br><br>
+
 ## Faire fonctionner le programme
 
 Il faut d'abord avoir python installé, version 3.14 minimum

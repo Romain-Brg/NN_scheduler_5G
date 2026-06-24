@@ -21,7 +21,9 @@ regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 net = Network_Mano(nbUsers=4,learning_rate=0.01)
-net.load_NN("NN_1Layer_9_5_remplissageMain.npz")
+net.load_NN("NN_1Layer_9_5_remplissageMain_Correct.npz")
+print(f" etat intitial du NN : \n W1 :\n {net.W1} \n b1 : \n  {net.b1} \n W2 : \n  {net.W2} \n b2: \n {net.b2}")
+
 # net.elagage()
 # net.save_NN("NN_1Layer_4_4U_real_V3_elague.npz")
 

@@ -69,4 +69,4 @@ print(f" activiation a1 des neurones du milieu (a1 = reLu(z1)) :\n {net.a1} \n \
 print(f"z2 = a1*W2 + b2: \n{net.z2}\n")
 print(f" activiation a1 des neurones de la dernière couche (a2 = reLu(z2)) :\n {net.a2}")
 
-net.save_NN("NN_1Layer_9_5_remplissageMain.npz")
+net.save_NN("NN_1Layer_9_5_remplissageMain_Correct.npz")

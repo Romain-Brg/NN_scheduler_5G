@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 
 from network import Network
 from network_v2 import Network_2
+from network_FaitMain import Network_Mano
+
 
 
 
@@ -17,9 +19,10 @@ regroupementTauxSucc = []
 meanTauxSucc = []
 stockageVitesses = []
 #qteMAx = 2000
-net = Network(nbUsers=4,learning_rate=0.00015)
-#net.load_NN("NN_1Layer_4_4U_real_v5.npz")
+net = Network_Mano(nbUsers=4,learning_rate=0.01,trainAll_neurals=False)
+#net.load_NN("mon_NN_a_charger.npz")
 nbUsers = net.nbUsers
+#net.print_NN()
 
 elagage = False
 
@@ -156,8 +159,8 @@ print(f"Taux de succès moyen suite à {step +1} tics : {np.mean(regroupementTau
       f"\n avec comme ecart-type {np.nanstd(regroupementTauxSucc)} et avec {nbErreur} erreurs faites ")
 
 
-net.save_NN("NN_1Layer_4_4U_real_v5.npz")
-
+net.save_NN("mon_NN_sauvegarder.npz")
+#net.print_NN()
 
 
 
