@@ -1,6 +1,7 @@
 # Projet Stage L3 Info - Réseau de Neurones et scheduling
 
 Un réseau de neurones codé exclusivement en Python à l'aide la bibliothèque NumPy. <br>
+Poursuite faite à coté des cours<br>
 <br>
 <br>
 
